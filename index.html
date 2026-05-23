@@ -672,7 +672,7 @@
   async function callAIGenerate(prompt, tipe) {
     const key = apiKeys.gemini;
     if (!key) { Swal.fire('Error', 'Masukkan Gemini API Key di Settings'); return null; }
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${key}`;
     const instruction = `Buat 3 soal ${tipe} tentang: ${prompt}. Format JSON: {"soal":[{"tipe":"PG","teks":"...","opsi":[{"label":"A","teks":"..."}],"jawaban":[0]}]}`;
     try {
       const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: instruction }] }] }) });
