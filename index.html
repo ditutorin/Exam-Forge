@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>ExamForge Pro | Generator Soal + Bank Soal</title>
+  <title>ExamForge Pro | 6 Tipe Soal + AI Generator</title>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,6 @@
       min-height: 100vh;
     }
     
-    /* Navbar Top */
     .navbar {
       background: linear-gradient(135deg, #0a3d2e, #0b4a38);
       padding: 16px 28px;
@@ -27,6 +26,9 @@
       flex-wrap: wrap;
       gap: 16px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     
     .logo {
@@ -41,13 +43,9 @@
       gap: 10px;
     }
     
-    .logo i { font-size: 1.8rem; color: #88e0b0; background: none; -webkit-background-clip: unset; background-clip: unset; color: #a8e6cf; }
+    .logo i { font-size: 1.8rem; color: #88e0b0; background: none; -webkit-background-clip: unset; color: #a8e6cf; }
     
-    .nav-links {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
     
     .nav-btn {
       background: rgba(255,255,255,0.1);
@@ -81,43 +79,39 @@
     .api-status.valid { background: #2e7d32; }
     .api-status.invalid { background: #c62828; }
     
-    /* Main Container */
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 24px;
-    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
     
-    /* Card */
     .card {
       background: rgba(255,255,255,0.95);
       border-radius: 28px;
-      padding: 24px;
-      margin-bottom: 24px;
+      padding: 28px;
+      margin-bottom: 28px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
     }
+    
+    .card:hover { transform: translateY(-2px); }
     
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       padding-bottom: 16px;
       border-bottom: 2px solid #e0f0e0;
     }
     
-    /* Mapel Tags */
     .mapel-container {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     
     .mapel-tag {
       background: #e8f5e9;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 40px;
       cursor: pointer;
       transition: all 0.2s;
@@ -138,23 +132,23 @@
     .btn-add-mapel {
       background: transparent;
       border: 2px dashed #2e7d32;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 40px;
       cursor: pointer;
       color: #2e7d32;
       font-weight: 500;
+      transition: all 0.2s;
     }
     
-    /* Form */
-    .form-group {
-      margin-bottom: 20px;
-    }
+    .btn-add-mapel:hover { background: #2e7d32; color: white; }
+    
+    .form-group { margin-bottom: 20px; }
     
     label {
       font-weight: 600;
       color: #1c4d2d;
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     
     input, select, textarea {
@@ -164,6 +158,7 @@
       border: 1.5px solid #cfe3cf;
       background: white;
       font-size: 0.9rem;
+      transition: all 0.2s;
     }
     
     input:focus, select:focus, textarea:focus {
@@ -172,27 +167,25 @@
       box-shadow: 0 0 0 3px rgba(46,125,50,0.2);
     }
     
-    /* Buttons */
     .btn {
       border: none;
-      padding: 10px 24px;
+      padding: 12px 28px;
       border-radius: 40px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       transition: all 0.2s;
     }
     
     .btn-primary { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; }
-    .btn-primary:hover { transform: scale(0.98); }
+    .btn-primary:hover { transform: scale(0.98); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     .btn-outline { background: transparent; border: 2px solid #2e7d32; color: #1b5e20; }
     .btn-outline:hover { background: #2e7d32; color: white; }
     .btn-danger { background: #d32f2f; color: white; }
     .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
     
-    /* Soal Editor */
     .soal-editor {
       background: #fffbe6;
       border-radius: 20px;
@@ -202,16 +195,15 @@
       font-size: 13px;
       line-height: 1.6;
       white-space: pre-wrap;
-      min-height: 250px;
-      max-height: 400px;
+      min-height: 280px;
+      max-height: 450px;
       overflow: auto;
     }
     
-    /* Soal Card di Bank */
     .soal-card {
       background: #f9fff9;
       border-radius: 20px;
-      padding: 16px;
+      padding: 20px;
       margin-bottom: 16px;
       border-left: 5px solid #2e7d32;
       position: relative;
@@ -219,8 +211,8 @@
     
     .soal-card-actions {
       position: absolute;
-      top: 12px;
-      right: 16px;
+      top: 16px;
+      right: 20px;
       display: flex;
       gap: 8px;
     }
@@ -229,8 +221,8 @@
       font-family: monospace;
       font-size: 13px;
       white-space: pre-wrap;
-      margin-top: 8px;
-      padding-right: 100px;
+      margin-top: 12px;
+      padding-right: 120px;
     }
     
     .badge-soal {
@@ -240,14 +232,31 @@
       border-radius: 20px;
       font-size: 0.7rem;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     
-    /* Grid */
     .flex-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    .grid-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
     
-    hr { margin: 16px 0; border: none; border-top: 1px solid #e0f0e0; }
+    hr { margin: 20px 0; border: none; border-top: 1px solid #e0f0e0; }
+    
+    .option-with-img {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+    
+    .option-with-img input { margin-bottom: 0; flex: 1; }
+    
+    .subsoal-form {
+      background: #f5f9f5;
+      padding: 20px;
+      border-radius: 20px;
+      margin: 16px 0;
+    }
     
     @media (max-width: 700px) {
       .navbar { flex-direction: column; text-align: center; }
@@ -259,33 +268,27 @@
 <body>
 
 <div class="navbar">
-  <div class="logo">
-    <i class="fas fa-brain"></i>
-    <span>ExamForge Pro</span>
-  </div>
+  <div class="logo"><i class="fas fa-brain"></i><span>ExamForge Pro</span></div>
   <div class="nav-links">
-    <button class="nav-btn" data-menu="generate"><i class="fas fa-microchip"></i> AI Generate</button>
+    <button class="nav-btn active" data-menu="generate"><i class="fas fa-microchip"></i> AI Generate</button>
     <button class="nav-btn" data-menu="manual"><i class="fas fa-pen-alt"></i> Buat Manual</button>
     <button class="nav-btn" data-menu="bank"><i class="fas fa-database"></i> Bank Soal</button>
     <button class="nav-btn" data-menu="settings"><i class="fas fa-cog"></i> Settings</button>
   </div>
-  <div class="api-status invalid" id="apiStatus">
-    <i class="fas fa-circle"></i> API Key: Belum Diset
-  </div>
+  <div class="api-status invalid" id="apiStatus"><i class="fas fa-circle"></i> API Key: Belum Diset</div>
 </div>
 
 <div class="container" id="mainContainer"></div>
 
 <script>
-  // ========== GLOBAL STATE ==========
+  // ========== STATE ==========
   let currentMenu = "generate";
   let currentMapel = "Matematika";
-  let bankSoal = {};  // { "Matematika": [ { id, raw, tipe, createdAt } ] }
+  let bankSoal = {};
   let apiKey = localStorage.getItem("geminiApiKey") || "";
   let gasUrl = localStorage.getItem("gasUrl") || "";
   let nextId = 1;
   
-  // ========== UTILITY ==========
   function updateApiStatus() {
     const el = document.getElementById("apiStatus");
     if (apiKey && apiKey.startsWith("AIza")) {
@@ -312,7 +315,10 @@
     apiKey = localStorage.getItem("geminiApiKey") || "";
     gasUrl = localStorage.getItem("gasUrl") || "";
     
-    // Generate ID terbesar untuk nextId
+    if (Object.keys(bankSoal).length === 0) {
+      bankSoal = { "Matematika": [], "IPA": [], "Bahasa Inggris": [] };
+    }
+    
     let maxId = 0;
     Object.values(bankSoal).forEach(soals => {
       soals.forEach(s => { if (s.id > maxId) maxId = s.id; });
@@ -322,36 +328,33 @@
     updateApiStatus();
   }
   
-  // ========== PARSER: Pisahkan teks jadi array soal ==========
+  // ========== PARSER SOAL ==========
   function parseSoalDariTeks(rawText) {
-    // Split berdasarkan delimiter === SOAL atau === Soal atau === soal
     const delimiter = /===+\s*(SOAL|Soal|soal)\s*\d*\s*===+/gi;
     const blocks = rawText.split(delimiter);
-    
     const soalList = [];
-    let currentBlock = "";
     
     for (let i = 0; i < blocks.length; i++) {
-      if (blocks[i].match(/^===/)) continue; // skip delimiter
-      currentBlock = blocks[i].trim();
-      if (currentBlock.length > 20) {
-        // Deteksi tipe soal dari konten
+      if (blocks[i].match(/^===/)) continue;
+      const content = blocks[i].trim();
+      if (content.length > 30) {
         let tipe = "PG";
-        if (currentBlock.toLowerCase().includes("narasi")) tipe = "NARASI";
-        else if (currentBlock.toLowerCase().includes("benar/salah") || currentBlock.toLowerCase().includes("pernyataan")) tipe = "BS";
-        else if (currentBlock.toLowerCase().includes("setuju")) tipe = "STTS";
+        if (content.toLowerCase().includes("narasi")) tipe = "NARASI";
+        else if (content.toLowerCase().includes("benar/salah") || content.toLowerCase().includes("pernyataan")) tipe = "BS";
+        else if (content.toLowerCase().includes("setuju")) tipe = "STTS";
+        else if (content.toLowerCase().includes("cukup") || content.toLowerCase().includes("kecukupan")) tipe = "CUKUP";
+        else if (content.toLowerCase().includes("pgk") || content.includes("jawaban >")) tipe = "PGK";
         
         soalList.push({
           id: nextId++,
-          raw: currentBlock,
+          raw: content,
           tipe: tipe,
           createdAt: new Date().toISOString()
         });
       }
     }
     
-    // Jika tidak terdeteksi delimiter, anggap 1 soal utuh
-    if (soalList.length === 0 && rawText.trim().length > 20) {
+    if (soalList.length === 0 && rawText.trim().length > 30) {
       soalList.push({
         id: nextId++,
         raw: rawText.trim(),
@@ -363,130 +366,65 @@
     return soalList;
   }
   
-  // ========== SIMPAN KE BANK SOAL (Otomatis parse) ==========
   function simpanKeBankSoal(rawText, mapel = currentMapel) {
-    if (!rawText || rawText.trim() === "") {
-      Swal.fire("Kosong", "Tidak ada soal yang disimpan", "warning");
-      return false;
-    }
-    
-    const parsedSoal = parseSoalDariTeks(rawText);
-    
+    if (!rawText || rawText.trim() === "") return 0;
+    const parsed = parseSoalDariTeks(rawText);
     if (!bankSoal[mapel]) bankSoal[mapel] = [];
-    
-    for (let soal of parsedSoal) {
-      bankSoal[mapel].push(soal);
-    }
-    
+    for (let soal of parsed) bankSoal[mapel].push(soal);
     saveToLocal();
     
-    // Sync ke GAS jika ada URL
     if (gasUrl) {
-      syncToGAS(mapel, parsedSoal);
+      fetch(gasUrl, {
+        method: "POST", mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "saveSoal", mapel: mapel, soal: soal })
+      }).catch(e => console.log(e));
     }
-    
-    return parsedSoal.length;
+    return parsed.length;
   }
   
-  async function syncToGAS(mapel, soalArray) {
-    try {
-      for (let soal of soalArray) {
-        await fetch(gasUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "saveSoal",
-            mapel: mapel,
-            soal: soal
-          })
-        });
-      }
-      console.log(`Sync ${soalArray.length} soal ke GAS untuk ${mapel}`);
-    } catch(e) {
-      console.error("GAS sync error:", e);
-    }
-  }
-  
-  // ========== HAPUS SOAL ==========
   function hapusSoal(mapel, id) {
     if (!bankSoal[mapel]) return;
     const index = bankSoal[mapel].findIndex(s => s.id === id);
-    if (index !== -1) {
-      bankSoal[mapel].splice(index, 1);
-      saveToLocal();
-      render();
-    }
+    if (index !== -1) { bankSoal[mapel].splice(index, 1); saveToLocal(); render(); }
   }
   
-  // ========== TAMBAH MAPEL ==========
+  // ========== MAPEL ==========
   async function tambahMapel() {
-    const { value: newMapel } = await Swal.fire({
+    const { value } = await Swal.fire({
       title: "Tambah Mapel Baru",
       input: "text",
-      inputPlaceholder: "Contoh: Fisika, Kimia, Ekonomi, Sejarah",
+      inputPlaceholder: "Contoh: Fisika, Kimia, Ekonomi, Sejarah, Sosiologi",
       showCancelButton: true
     });
-    if (newMapel && newMapel.trim() && !bankSoal[newMapel.trim()]) {
-      bankSoal[newMapel.trim()] = [];
+    if (value && value.trim() && !bankSoal[value.trim()]) {
+      bankSoal[value.trim()] = [];
       saveToLocal();
-      currentMapel = newMapel.trim();
+      currentMapel = value.trim();
       render();
-      Swal.fire("Berhasil!", `Mapel ${newMapel} ditambahkan`, "success");
-    } else if (bankSoal[newMapel]) {
-      Swal.fire("Gagal", "Mapel sudah ada", "error");
-    }
+      Swal.fire("Berhasil!", `Mapel ${value} ditambahkan`, "success");
+    } else if (bankSoal[value]) Swal.fire("Gagal", "Mapel sudah ada", "error");
   }
   
   function hapusMapel(mapel) {
-    if (mapel === currentMapel) {
-      Swal.fire("Tidak bisa", "Pilih mapel lain dulu", "warning");
-      return;
-    }
-    Swal.fire({
-      title: `Hapus ${mapel}?`,
-      text: "Semua soal akan hilang!",
-      icon: "warning",
-      showCancelButton: true
-    }).then(res => {
-      if (res.isConfirmed) {
-        delete bankSoal[mapel];
-        saveToLocal();
-        render();
-      }
+    if (mapel === currentMapel) { Swal.fire("Tidak bisa", "Pilih mapel lain dulu", "warning"); return; }
+    Swal.fire({ title: `Hapus ${mapel}?`, text: "Semua soal akan hilang!", icon: "warning", showCancelButton: true }).then(res => {
+      if (res.isConfirmed) { delete bankSoal[mapel]; saveToLocal(); render(); }
     });
   }
   
-  // ========== RENDER MAPEL TAGS ==========
   function renderMapelTags(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
-    const mapels = Object.keys(bankSoal);
-    if (mapels.length === 0) {
-      bankSoal["Matematika"] = [];
-      bankSoal["IPA"] = [];
-      bankSoal["Bahasa Inggris"] = [];
-      saveToLocal();
-    }
-    
     let html = `<div class="mapel-container">`;
     Object.keys(bankSoal).forEach(m => {
-      html += `<div class="mapel-tag ${currentMapel === m ? 'active' : ''}" data-mapel="${m}">
-        ${m}
-        <i class="fas fa-times-circle" onclick="event.stopPropagation(); hapusMapel('${m}')"></i>
-      </div>`;
+      html += `<div class="mapel-tag ${currentMapel === m ? 'active' : ''}" data-mapel="${m}">${m}<i class="fas fa-times-circle" onclick="event.stopPropagation(); hapusMapel('${m}')"></i></div>`;
     });
     html += `<button class="btn-add-mapel" id="btnTambahMapel"><i class="fas fa-plus"></i> Tambah Mapel</button></div>`;
     container.innerHTML = html;
     
     document.querySelectorAll('.mapel-tag').forEach(tag => {
-      tag.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'I') {
-          currentMapel = tag.dataset.mapel;
-          render();
-        }
-      });
+      tag.addEventListener('click', (e) => { if (e.target.tagName !== 'I') { currentMapel = tag.dataset.mapel; render(); } });
     });
     document.getElementById('btnTambahMapel')?.addEventListener('click', tambahMapel);
   }
@@ -504,50 +442,56 @@
     
     Swal.fire({ title: "AI Sedang Membuat Soal...", didOpen: () => Swal.showLoading() });
     
-    let instruction = `Buatkan ${tipe === "NARASI" ? "1 narasi panjang dengan 3-5 sub soal" : "3-5 soal"} dengan format TEKS biasa seperti contoh:
+    let instruction = `Buatkan ${tipe === "NARASI" ? "1 narasi panjang dengan 3-5 sub soal" : tipe === "CUKUP" ? "soal kecukupan data" : tipe === "BS" ? "5 pernyataan benar/salah" : tipe === "STTS" ? "5 pernyataan setuju/tidak setuju" : "3-5 soal pilihan ganda"} dengan format TEKS biasa seperti contoh:
+
+${tipe === "PG" ? `=== SOAL 1 ===
+Tipe: PG
+Teks: Apa ibu kota Indonesia?
+A. Jakarta
+B. Surabaya
+C. Bandung
+D. Medan
+Jawaban: A` : tipe === "PGK" ? `=== SOAL 1 ===
+Tipe: PGK
+Teks: Manakah yang termasuk hewan mamalia?
+A. Kucing (benar)
+B. Ikan (salah)
+C. Sapi (benar)
+D. Burung (salah)
+Jawaban: A,C` : tipe === "NARASI" ? `=== NARASI ===
+Teks: Indonesia memiliki keanekaragaman hayati yang tinggi...
 
 === SOAL 1 ===
-Tipe: PG
-Teks: Pertanyaan?
-A. Opsi A
-B. Opsi B
-C. Opsi C
-D. Opsi D
-Jawaban: A
-
-=== SOAL 2 ===
-Tipe: PG
-Teks: Pertanyaan 2?
-A. Opsi A
-B. Opsi B
-C. Opsi C
-D. Opsi D
-Jawaban: B
-
-${tipe === "NARASI" ? `=== NARASI ===
-Teks: Bacaan narasi panjang...
-
-=== SOAL 1 ===
-Pertanyaan: ...?
-A. ...
-B. ...
-C. ...
-D. ...
+Pertanyaan: Apa ibukota Indonesia?
+A. Jakarta
+B. Surabaya
 Jawaban: A` : tipe === "BS" ? `=== SOAL ===
 Tipe: BS
-Narasi: Teks materi...
-Pernyataan 1: ...
-Pernyataan 2: ...
-Pernyataan 3: ...
-Pernyataan 4: ...
-Pernyataan 5: ...
-Kunci Jawaban: B,S,B,S,B` : ""}
+Narasi: Teks tentang materi...
+Pernyataan 1: Indonesia merdeka tahun 1945
+Pernyataan 2: Ibu kota Indonesia adalah Surabaya
+Pernyataan 3: Presiden pertama adalah Soekarno
+Pernyataan 4: Bahasa nasional adalah Bahasa Jawa
+Pernyataan 5: Bendera Indonesia merah putih
+Kunci Jawaban: B,S,B,S,B` : tipe === "STTS" ? `=== SOAL ===
+Tipe: STTS
+Narasi: Teks tentang materi...
+Pernyataan 1: Saya setuju dengan konsep ini
+Pernyataan 2: Materi ini mudah dipahami
+Pernyataan 3: Pembelajaran ini bermanfaat
+Pernyataan 4: Saya merekomendasikan ke teman
+Pernyataan 5: Konsep ini penting untuk masa depan` : `=== SOAL ===
+Tipe: CUKUP
+Pertanyaan: Apakah pernyataan A dan B cukup untuk menjawab?
+Pernyataan A: ...
+Pernyataan B: ...
+Kunci: A`}
 
 Materi: ${prompt}
 Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
     
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -564,11 +508,177 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
       
       document.getElementById("aiResult").innerText = result;
       Swal.fire("Berhasil!", "Soal sudah digenerate, bisa diedit lalu simpan", "success");
-      
-    } catch(e) {
-      Swal.close();
-      Swal.fire("Error", e.message, "error");
+    } catch(e) { Swal.close(); Swal.fire("Error", e.message, "error"); }
+  }
+  
+  // ========== RENDER MANUAL FORM (SEMUA TIPE) ==========
+  let manualFormType = "pg";
+  
+  function renderManualForm() {
+    const tipe = document.getElementById("manualTipeSelect")?.value || "pg";
+    manualFormType = tipe;
+    const area = document.getElementById("manualFormArea");
+    if (!area) return;
+    
+    if (tipe === "pg") {
+      area.innerHTML = `
+        <label>Teks Soal</label><textarea id="pgTeks" rows="2" placeholder="Masukkan pertanyaan"></textarea>
+        <label>Gambar Soal (URL)</label><input id="pgGambar" placeholder="https://...">
+        <label>Jumlah Opsi</label><select id="pgJmlOpsi" onchange="renderPGOptions()"><option value="4">A-D (SD/SMP)</option><option value="5">A-E (SMA)</option></select>
+        <div id="pgOptionsArea"></div>
+        <label>Jawaban Benar (pisah koma, 0=A, 1=B, dst)</label><input id="pgJawaban" placeholder="0 atau 0,2">
+      `;
+      renderPGOptions();
+    } else if (tipe === "pgk") {
+      area.innerHTML = `
+        <label>Teks Soal</label><textarea id="pgkTeks" rows="2"></textarea>
+        <label>Gambar Soal</label><input id="pgkGambar">
+        <div id="pgkOptionsArea"></div>
+        <label>Jawaban Benar (pisah koma, contoh: 0,2)</label><input id="pgkJawaban" placeholder="0,2">
+      `;
+      renderPGKOptions();
+    } else if (tipe === "narasi") {
+      area.innerHTML = `
+        <label>Teks Narasi</label><textarea id="narasiTeks" rows="4" placeholder="Bacaan panjang untuk 3-5 soal"></textarea>
+        <label>Gambar Narasi</label><input id="narasiGambar">
+        <label>Jumlah Soal</label><input id="narasiJml" type="number" value="3" min="1" max="5" onchange="renderSubSoalForms()">
+        <div id="subSoalContainer"></div>
+      `;
+      renderSubSoalForms();
+    } else if (tipe === "bs") {
+      area.innerHTML = `
+        <label>Teks Narasi</label><textarea id="bsNarasi" rows="3"></textarea>
+        <label>Gambar</label><input id="bsGambar">
+        <div id="bsPernyataanContainer"></div>
+        <label>Kunci (B/S pisah koma)</label><input id="bsKunci" placeholder="B,S,B,S,B">
+      `;
+      renderBSPernyataan();
+    } else if (tipe === "stts") {
+      area.innerHTML = `
+        <label>Teks Narasi</label><textarea id="sttsNarasi" rows="3"></textarea>
+        <label>Gambar</label><input id="sttsGambar">
+        <div id="sttsPernyataanContainer"></div>
+      `;
+      renderSTTSPernyataan();
+    } else if (tipe === "cukup") {
+      area.innerHTML = `
+        <label>Pertanyaan Utama</label><textarea id="cukupTeks" rows="2"></textarea>
+        <label>Pernyataan A</label><textarea id="cukupA" rows="2"></textarea>
+        <label>Gambar Opsi A</label><input id="cukupAGambar">
+        <label>Pernyataan B</label><textarea id="cukupB" rows="2"></textarea>
+        <label>Gambar Opsi B</label><input id="cukupBGambar">
+        <label>Gambar Opsi C</label><input id="cukupCGambar">
+        <label>Gambar Opsi D</label><input id="cukupDGambar">
+        <label>Kunci Jawaban</label><select id="cukupKunci"><option>A</option><option>B</option><option>C</option><option>D</option></select>
+      `;
     }
+  }
+  
+  window.renderPGOptions = function() {
+    const jml = parseInt(document.getElementById('pgJmlOpsi')?.value || 4);
+    const container = document.getElementById('pgOptionsArea');
+    if (!container) return;
+    let html = '<label>Opsi + Gambar</label>';
+    for (let i=0; i<jml; i++) {
+      const huruf = String.fromCharCode(65+i);
+      html += `<div class="option-with-img"><strong>${huruf}.</strong><input id="pgOpt${i}" placeholder="Teks ${huruf}"><input id="pgOptImg${i}" placeholder="URL Gambar" style="width:150px"></div>`;
+    }
+    container.innerHTML = html;
+  };
+  
+  window.renderPGKOptions = function() {
+    const container = document.getElementById('pgkOptionsArea');
+    if (!container) return;
+    let html = '<label>Opsi A-D + Gambar</label>';
+    for (let i=0; i<4; i++) {
+      const huruf = String.fromCharCode(65+i);
+      html += `<div class="option-with-img"><strong>${huruf}.</strong><input id="pgkOpt${i}" placeholder="Teks ${huruf}"><input id="pgkOptImg${i}" placeholder="URL Gambar" style="width:150px"></div>`;
+    }
+    container.innerHTML = html;
+  };
+  
+  window.renderSubSoalForms = function() {
+    const jml = parseInt(document.getElementById('narasiJml')?.value || 3);
+    const container = document.getElementById('subSoalContainer');
+    if (!container) return;
+    let html = '<h4>Soal dalam Narasi</h4>';
+    for (let i=0; i<jml; i++) {
+      html += `<div class="subsoal-form"><strong>Soal ${i+1}</strong><input id="subTeks${i}" placeholder="Pertanyaan"><div class="flex-row"><input id="subOptA${i}" placeholder="A"><input id="subOptB${i}" placeholder="B"><input id="subOptC${i}" placeholder="C"><input id="subOptD${i}" placeholder="D"></div><label>Jawaban</label><select id="subJawaban${i}"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>`;
+    }
+    container.innerHTML = html;
+  };
+  
+  window.renderBSPernyataan = function() {
+    const container = document.getElementById('bsPernyataanContainer');
+    if (!container) return;
+    let html = '<h4>5 Pernyataan</h4>';
+    for (let i=0; i<5; i++) html += `<input id="bsPernyataan${i}" placeholder="Pernyataan ${i+1}" style="margin:8px 0">`;
+    container.innerHTML = html;
+  };
+  
+  window.renderSTTSPernyataan = function() {
+    const container = document.getElementById('sttsPernyataanContainer');
+    if (!container) return;
+    let html = '<h4>5 Pernyataan (Setuju/Tidak)</h4>';
+    for (let i=0; i<5; i++) html += `<input id="sttsPernyataan${i}" placeholder="Pernyataan ${i+1}" style="margin:8px 0">`;
+    container.innerHTML = html;
+  };
+  
+  function simpanManual() {
+    const tipe = manualFormType;
+    let rawText = "";
+    
+    if (tipe === "pg") {
+      const jml = parseInt(document.getElementById('pgJmlOpsi').value);
+      let teks = `=== SOAL ===\nTipe: PG\nTeks: ${document.getElementById('pgTeks').value}\n`;
+      for (let i=0; i<jml; i++) {
+        teks += `${String.fromCharCode(65+i)}. ${document.getElementById(`pgOpt${i}`)?.value || ''}\n`;
+      }
+      teks += `Jawaban: ${document.getElementById('pgJawaban').value}\n`;
+      rawText = teks;
+    } else if (tipe === "pgk") {
+      let teks = `=== SOAL ===\nTipe: PGK\nTeks: ${document.getElementById('pgkTeks').value}\n`;
+      for (let i=0; i<4; i++) {
+        teks += `${String.fromCharCode(65+i)}. ${document.getElementById(`pgkOpt${i}`)?.value || ''}\n`;
+      }
+      teks += `Jawaban: ${document.getElementById('pgkJawaban').value}\n`;
+      rawText = teks;
+    } else if (tipe === "narasi") {
+      let teks = `=== NARASI ===\nTeks: ${document.getElementById('narasiTeks').value}\n\n`;
+      const jml = parseInt(document.getElementById('narasiJml').value);
+      for (let i=0; i<jml; i++) {
+        teks += `=== SOAL ${i+1} ===\nPertanyaan: ${document.getElementById(`subTeks${i}`)?.value || ''}\n`;
+        teks += `A. ${document.getElementById(`subOptA${i}`)?.value || ''}\n`;
+        teks += `B. ${document.getElementById(`subOptB${i}`)?.value || ''}\n`;
+        teks += `C. ${document.getElementById(`subOptC${i}`)?.value || ''}\n`;
+        teks += `D. ${document.getElementById(`subOptD${i}`)?.value || ''}\n`;
+        teks += `Jawaban: ${document.getElementById(`subJawaban${i}`)?.value || 'A'}\n\n`;
+      }
+      rawText = teks;
+    } else if (tipe === "bs") {
+      let teks = `=== SOAL ===\nTipe: BS\nNarasi: ${document.getElementById('bsNarasi').value}\n`;
+      for (let i=0; i<5; i++) {
+        teks += `Pernyataan ${i+1}: ${document.getElementById(`bsPernyataan${i}`)?.value || ''}\n`;
+      }
+      teks += `Kunci Jawaban: ${document.getElementById('bsKunci').value}\n`;
+      rawText = teks;
+    } else if (tipe === "stts") {
+      let teks = `=== SOAL ===\nTipe: STTS\nNarasi: ${document.getElementById('sttsNarasi').value}\n`;
+      for (let i=0; i<5; i++) {
+        teks += `Pernyataan ${i+1}: ${document.getElementById(`sttsPernyataan${i}`)?.value || ''}\n`;
+      }
+      rawText = teks;
+    } else if (tipe === "cukup") {
+      let teks = `=== SOAL ===\nTipe: CUKUP\nPertanyaan: ${document.getElementById('cukupTeks').value}\n`;
+      teks += `Pernyataan A: ${document.getElementById('cukupA').value}\n`;
+      teks += `Pernyataan B: ${document.getElementById('cukupB').value}\n`;
+      teks += `Kunci: ${document.getElementById('cukupKunci').value}\n`;
+      rawText = teks;
+    }
+    
+    const jumlah = simpanKeBankSoal(rawText, currentMapel);
+    if (jumlah > 0) Swal.fire("Tersimpan!", `${jumlah} soal disimpan ke ${currentMapel}`, "success");
+    else Swal.fire("Kosong", "Isi soal terlebih dahulu", "warning");
   }
   
   // ========== RENDER ==========
@@ -578,152 +688,98 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
     if (currentMenu === "generate") {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header">
-            <h2><i class="fas fa-microchip"></i> AI Generate Soal</h2>
-            <div id="mapelTagsGenerate"></div>
-          </div>
+          <div class="card-header"><h2><i class="fas fa-microchip"></i> AI Generate Soal</h2><div id="mapelTagsGen"></div></div>
           <div class="form-group">
-            <label><i class="fas fa-list"></i> Tipe Soal</label>
+            <label><i class="fas fa-list"></i> Tipe Soal (6 Pilihan)</label>
             <select id="aiTipe">
-              <option value="PG">Pilihan Ganda (PG)</option>
-              <option value="NARASI">Narasi + Sub Soal</option>
-              <option value="BS">Benar/Salah (5 Pernyataan)</option>
+              <option value="PG">PG - Pilihan Ganda Biasa</option>
+              <option value="PGK">PGK - Pilihan Ganda Kompleks (>1 jawaban)</option>
+              <option value="NARASI">NARASI - 1 Narasi untuk 3-5 Soal</option>
+              <option value="BS">BS - Benar/Salah (5 Pernyataan)</option>
+              <option value="STTS">STTS - Setuju/Tidak Setuju (INK Model)</option>
+              <option value="CUKUP">CUKUP - Kecukupan Data + Gambar</option>
             </select>
           </div>
           <div class="form-group">
             <label><i class="fas fa-book"></i> Materi / Prompt</label>
-            <textarea id="aiPrompt" rows="4" placeholder="Contoh: Buat soal tentang sistem pernapasan manusia untuk kelas 8, tingkat HOTS"></textarea>
+            <textarea id="aiPrompt" rows="4" placeholder="Contoh: Buat soal tentang sistem pernapasan manusia kelas 8, tingkat HOTS"></textarea>
           </div>
           <button id="btnGenerateAI" class="btn-primary"><i class="fas fa-magic"></i> Generate Soal</button>
-          
           <hr>
-          
-          <div class="flex-between">
-            <label><i class="fas fa-edit"></i> Hasil Generate (Edit Bebas)</label>
-            <button id="btnSimpanHasil" class="btn-outline btn-sm"><i class="fas fa-save"></i> Simpan ke Bank Soal (${currentMapel})</button>
-          </div>
+          <div class="flex-between"><label><i class="fas fa-edit"></i> Hasil Generate (Edit Bebas)</label><button id="btnSimpanHasil" class="btn-outline btn-sm"><i class="fas fa-save"></i> Simpan ke ${currentMapel}</button></div>
           <div id="aiResult" class="soal-editor" contenteditable="true">Hasil generate akan muncul di sini... Bisa diedit langsung.</div>
         </div>
       `;
-      renderMapelTags("mapelTagsGenerate");
+      renderMapelTags("mapelTagsGen");
       document.getElementById("btnGenerateAI")?.addEventListener("click", generateSoalAI);
       document.getElementById("btnSimpanHasil")?.addEventListener("click", () => {
         const teks = document.getElementById("aiResult").innerText;
-        const jumlah = simpanKeBankSoal(teks, currentMapel);
-        if (jumlah > 0) {
-          Swal.fire("Tersimpan!", `${jumlah} soal disimpan ke ${currentMapel}`, "success");
-          document.getElementById("aiResult").innerText = "";
-        }
+        const jml = simpanKeBankSoal(teks, currentMapel);
+        if (jml > 0) { Swal.fire("Tersimpan!", `${jml} soal ke ${currentMapel}`, "success"); document.getElementById("aiResult").innerText = ""; }
       });
     }
     else if (currentMenu === "manual") {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header">
-            <h2><i class="fas fa-pen-alt"></i> Buat Soal Manual</h2>
-            <div id="mapelTagsManual"></div>
-          </div>
+          <div class="card-header"><h2><i class="fas fa-pen-alt"></i> Buat Soal Manual (6 Tipe)</h2><div id="mapelTagsManual"></div></div>
           <div class="form-group">
-            <label><i class="fas fa-quote-left"></i> Tulis Soal (format bebas, pisahkan dengan === SOAL === untuk multiple)</label>
-            <textarea id="manualSoal" rows="12" class="soal-editor" style="font-family:monospace" placeholder="Contoh:
-=== SOAL 1 ===
-Tipe: PG
-Teks: Apa ibu kota Indonesia?
-A. Jakarta
-B. Surabaya
-C. Bandung
-D. Medan
-Jawaban: A
-
-=== SOAL 2 ===
-Tipe: PG
-Teks: Siapa presiden pertama?
-A. Soeharto
-B. Soekarno
-C. Habibie
-D. Gus Dur
-Jawaban: B"></textarea>
+            <label><i class="fas fa-list"></i> Pilih Tipe Soal</label>
+            <select id="manualTipeSelect" onchange="renderManualForm()">
+              <option value="pg">PG - Pilihan Ganda Biasa</option>
+              <option value="pgk">PGK - Pilihan Ganda Kompleks (>1 jawaban)</option>
+              <option value="narasi">NARASI - 1 Narasi untuk 3-5 Soal</option>
+              <option value="bs">BS - Benar/Salah (5 Pernyataan)</option>
+              <option value="stts">STTS - Setuju/Tidak Setuju</option>
+              <option value="cukup">CUKUP - Kecukupan Data + Gambar</option>
+            </select>
           </div>
-          <button id="btnSimpanManual" class="btn-primary"><i class="fas fa-save"></i> Simpan ke Bank Soal (${currentMapel})</button>
+          <div id="manualFormArea"></div>
+          <button id="btnSimpanManual" class="btn-primary"><i class="fas fa-save"></i> Simpan ke ${currentMapel}</button>
         </div>
       `;
       renderMapelTags("mapelTagsManual");
-      document.getElementById("btnSimpanManual")?.addEventListener("click", () => {
-        const teks = document.getElementById("manualSoal").value;
-        const jumlah = simpanKeBankSoal(teks, currentMapel);
-        if (jumlah > 0) {
-          Swal.fire("Tersimpan!", `${jumlah} soal disimpan ke ${currentMapel}`, "success");
-          document.getElementById("manualSoal").value = "";
-        } else {
-          Swal.fire("Kosong", "Tulis soal dulu", "warning");
-        }
-      });
+      window.renderManualForm = renderManualForm;
+      window.renderPGOptions = renderPGOptions;
+      window.renderPGKOptions = renderPGKOptions;
+      window.renderSubSoalForms = renderSubSoalForms;
+      window.renderBSPernyataan = renderBSPernyataan;
+      window.renderSTTSPernyataan = renderSTTSPernyataan;
+      renderManualForm();
+      document.getElementById("btnSimpanManual")?.addEventListener("click", simpanManual);
     }
     else if (currentMenu === "bank") {
       const soals = bankSoal[currentMapel] || [];
       container.innerHTML = `
         <div class="card">
-          <div class="card-header">
-            <h2><i class="fas fa-database"></i> Bank Soal</h2>
-            <div id="mapelTagsBank"></div>
-          </div>
-          <div class="flex-between" style="margin-bottom: 16px;">
-            <span class="badge-soal"><i class="fas fa-list"></i> Total: ${soals.length} soal</span>
-            <button id="btnExportBank" class="btn-outline btn-sm"><i class="fas fa-download"></i> Export Semua</button>
-          </div>
+          <div class="card-header"><h2><i class="fas fa-database"></i> Bank Soal - ${currentMapel}</h2><div id="mapelTagsBank"></div></div>
+          <div class="flex-between"><span class="badge-soal"><i class="fas fa-list"></i> Total: ${soals.length} soal</span><button id="btnExportBank" class="btn-outline btn-sm"><i class="fas fa-download"></i> Export Semua</button></div>
           <div id="bankSoalList">
-            ${soals.length === 0 ? '<i>Tidak ada soal. Generate atau buat manual dulu.</i>' : 
-              soals.map(s => `
-                <div class="soal-card">
-                  <div class="soal-card-actions">
-                    <button class="btn-outline btn-sm btn-edit" data-id="${s.id}"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn-danger btn-sm btn-hapus" data-id="${s.id}"><i class="fas fa-trash"></i> Hapus</button>
-                  </div>
-                  <span class="badge-soal">ID: ${s.id} | ${s.tipe} | ${new Date(s.createdAt).toLocaleDateString()}</span>
-                  <pre>${escapeHtml(s.raw)}</pre>
+            ${soals.length === 0 ? '<i>Tidak ada soal. Generate atau buat manual dulu.</i>' : soals.map(s => `
+              <div class="soal-card">
+                <div class="soal-card-actions">
+                  <button class="btn-outline btn-sm btn-edit" data-id="${s.id}"><i class="fas fa-edit"></i> Edit</button>
+                  <button class="btn-danger btn-sm btn-hapus" data-id="${s.id}"><i class="fas fa-trash"></i> Hapus</button>
                 </div>
-              `).join('')}
+                <span class="badge-soal">ID: ${s.id} | ${s.tipe} | ${new Date(s.createdAt).toLocaleDateString()}</span>
+                <pre>${escapeHtml(s.raw)}</pre>
+              </div>`).join('')}
           </div>
         </div>
       `;
       renderMapelTags("mapelTagsBank");
-      
-      // Event hapus
-      document.querySelectorAll(".btn-hapus").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          const id = parseInt(btn.dataset.id);
-          hapusSoal(currentMapel, id);
-        });
-      });
-      
-      // Event edit
+      document.querySelectorAll(".btn-hapus").forEach(btn => btn.addEventListener("click", (e) => hapusSoal(currentMapel, parseInt(btn.dataset.id))));
       document.querySelectorAll(".btn-edit").forEach(btn => {
         btn.addEventListener("click", async (e) => {
           const id = parseInt(btn.dataset.id);
           const soal = bankSoal[currentMapel].find(s => s.id === id);
           if (soal) {
-            const { value: newText } = await Swal.fire({
-              title: "Edit Soal",
-              input: "textarea",
-              inputValue: soal.raw,
-              inputPlaceholder: "Edit teks soal...",
-              showCancelButton: true,
-              inputAttributes: { style: "font-family:monospace; height:300px" }
-            });
-            if (newText) {
-              soal.raw = newText;
-              soal.createdAt = new Date().toISOString();
-              saveToLocal();
-              render();
-              Swal.fire("Tersimpan!", "Soal sudah diupdate", "success");
-            }
+            const { value } = await Swal.fire({ title: "Edit Soal", input: "textarea", inputValue: soal.raw, inputAttributes: { style: "height:300px;font-family:monospace" }, showCancelButton: true });
+            if (value) { soal.raw = value; soal.createdAt = new Date().toISOString(); saveToLocal(); render(); Swal.fire("Tersimpan!"); }
           }
         });
       });
-      
       document.getElementById("btnExportBank")?.addEventListener("click", () => {
-        const allSoals = bankSoal[currentMapel] || [];
-        const exportText = allSoals.map(s => `=== SOAL ${s.id} ===\n${s.raw}`).join("\n\n");
+        const exportText = soals.map(s => `=== SOAL ${s.id} ===\n${s.raw}`).join("\n\n");
         const blob = new Blob([exportText], { type: "text/plain" });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -736,20 +792,9 @@ Jawaban: B"></textarea>
       container.innerHTML = `
         <div class="card">
           <h2><i class="fas fa-cog"></i> Settings</h2>
-          <div class="form-group">
-            <label><i class="fab fa-google"></i> Gemini API Key</label>
-            <input type="text" id="settingsApiKey" value="${apiKey}" placeholder="AIzaSy...">
-            <small style="color: #666;">Dapatkan di <a href="https://aistudio.google.com" target="_blank">AI Studio Google</a></small>
-          </div>
-          <div class="form-group">
-            <label><i class="fas fa-cloud-upload-alt"></i> Google Apps Script URL (opsional)</label>
-            <input type="text" id="settingsGasUrl" value="${gasUrl}" placeholder="https://script.google.com/macros/s/.../exec">
-            <small>Isi jika ingin sync ke Google Sheets</small>
-          </div>
-          <div class="flex-row">
-            <button id="btnSaveSettings" class="btn-primary"><i class="fas fa-save"></i> Simpan</button>
-            <button id="btnTestGas" class="btn-outline"><i class="fas fa-vial"></i> Test GAS</button>
-          </div>
+          <div class="form-group"><label><i class="fab fa-google"></i> Gemini API Key</label><input id="settingsApiKey" value="${apiKey}" placeholder="AIzaSy..."><small>Dapatkan di <a href="https://aistudio.google.com" target="_blank">AI Studio Google</a></small></div>
+          <div class="form-group"><label><i class="fas fa-cloud-upload-alt"></i> Google Apps Script URL</label><input id="settingsGasUrl" value="${gasUrl}" placeholder="https://script.google.com/macros/s/.../exec"><small>Isi jika ingin sync ke Google Sheets</small></div>
+          <div class="flex-row"><button id="btnSaveSettings" class="btn-primary">Simpan</button><button id="btnTestGas" class="btn-outline">Test GAS</button></div>
         </div>
       `;
       document.getElementById("btnSaveSettings")?.addEventListener("click", () => {
@@ -757,28 +802,16 @@ Jawaban: B"></textarea>
         gasUrl = document.getElementById("settingsGasUrl").value;
         saveToLocal();
         updateApiStatus();
-        Swal.fire("Tersimpan!", "API Key dan GAS URL disimpan", "success");
+        Swal.fire("Tersimpan!");
       });
       document.getElementById("btnTestGas")?.addEventListener("click", async () => {
         if (!gasUrl) { Swal.fire("GAS URL kosong"); return; }
-        try {
-          await fetch(gasUrl, { method: "GET", mode: "no-cors" });
-          Swal.fire("Test", "Request dikirim (no-cors mode)", "info");
-        } catch(e) {
-          Swal.fire("Error", e.message, "error");
-        }
+        try { await fetch(gasUrl, { method: "GET", mode: "no-cors" }); Swal.fire("Test", "Request dikirim", "info"); } catch(e) { Swal.fire("Error", e.message, "error"); }
       });
     }
   }
   
-  function escapeHtml(str) {
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
-  }
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
   
   // ========== NAVIGASI ==========
   document.querySelectorAll(".nav-btn").forEach(btn => {
@@ -790,7 +823,6 @@ Jawaban: B"></textarea>
     });
   });
   
-  // ========== INIT ==========
   loadFromLocal();
   render();
 </script>
