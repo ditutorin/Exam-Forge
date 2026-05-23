@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>ExamForge Pro | 6 Tipe Soal + AI Generator</title>
+  <title>ExamForge Pro | 6 Tipe Soal + Sync ke Google Sheets</title>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
@@ -78,6 +78,13 @@
     
     .api-status.valid { background: #2e7d32; }
     .api-status.invalid { background: #c62828; }
+    .api-status.syncing { background: #f9a825; animation: pulse 1s infinite; }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
     
     .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
     
@@ -185,6 +192,7 @@
     .btn-outline:hover { background: #2e7d32; color: white; }
     .btn-danger { background: #d32f2f; color: white; }
     .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+    .btn-sync { background: #f9a825; color: #1c4d2d; }
     
     .soal-editor {
       background: #fffbe6;
@@ -258,6 +266,12 @@
       margin: 16px 0;
     }
     
+    .sync-status {
+      font-size: 0.7rem;
+      margin-left: 8px;
+      color: #888;
+    }
+    
     @media (max-width: 700px) {
       .navbar { flex-direction: column; text-align: center; }
       .soal-card-actions { position: static; margin-top: 12px; justify-content: flex-end; }
@@ -275,7 +289,9 @@
     <button class="nav-btn" data-menu="bank"><i class="fas fa-database"></i> Bank Soal</button>
     <button class="nav-btn" data-menu="settings"><i class="fas fa-cog"></i> Settings</button>
   </div>
-  <div class="api-status invalid" id="apiStatus"><i class="fas fa-circle"></i> API Key: Belum Diset</div>
+  <div class="api-status invalid" id="apiStatus">
+    <i class="fas fa-circle"></i> API Key: Belum Diset
+  </div>
 </div>
 
 <div class="container" id="mainContainer"></div>
@@ -288,9 +304,16 @@
   let apiKey = localStorage.getItem("geminiApiKey") || "";
   let gasUrl = localStorage.getItem("gasUrl") || "";
   let nextId = 1;
+  let isSyncing = false;
   
-  function updateApiStatus() {
+  // ========== UPDATE UI ==========
+  function updateApiStatus(showSyncing = false) {
     const el = document.getElementById("apiStatus");
+    if (showSyncing) {
+      el.className = "api-status syncing";
+      el.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Sinkronisasi...';
+      return;
+    }
     if (apiKey && apiKey.startsWith("AIza")) {
       el.className = "api-status valid";
       el.innerHTML = '<i class="fas fa-check-circle"></i> Gemini API: Aktif';
@@ -301,14 +324,14 @@
   }
   
   function saveToLocal() {
-    localStorage.setItem("bankSoalV2", JSON.stringify(bankSoal));
+    localStorage.setItem("bankSoalV3", JSON.stringify(bankSoal));
     localStorage.setItem("currentMapel", currentMapel);
     localStorage.setItem("geminiApiKey", apiKey);
     localStorage.setItem("gasUrl", gasUrl);
   }
   
   function loadFromLocal() {
-    const saved = localStorage.getItem("bankSoalV2");
+    const saved = localStorage.getItem("bankSoalV3");
     if (saved) bankSoal = JSON.parse(saved);
     const savedMapel = localStorage.getItem("currentMapel");
     if (savedMapel) currentMapel = savedMapel;
@@ -328,16 +351,87 @@
     updateApiStatus();
   }
   
+  // ========== SYNC KE GAS ==========
+  async function callGAS(action, data = {}) {
+    if (!gasUrl) return { success: false, error: "GAS URL belum diisi" };
+    try {
+      const response = await fetch(gasUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, ...data })
+      });
+      return await response.json();
+    } catch (e) {
+      console.error("GAS Error:", e);
+      return { success: false, error: e.message };
+    }
+  }
+  
+  async function syncMapelToGAS(mapel) {
+    if (!gasUrl) return false;
+    try {
+      await callGAS("ensureMapel", { mapel: mapel });
+      console.log(`Mapel ${mapel} synced to GAS`);
+      return true;
+    } catch(e) {
+      console.error("Sync mapel error:", e);
+      return false;
+    }
+  }
+  
+  async function syncSoalToGAS(mapel, soal) {
+    if (!gasUrl) return false;
+    try {
+      await callGAS("saveSoal", { mapel: mapel, soal: soal });
+      console.log(`Soal ${soal.id} synced to GAS`);
+      return true;
+    } catch(e) {
+      console.error("Sync soal error:", e);
+      return false;
+    }
+  }
+  
+  async function syncAllMapelsToGAS() {
+    if (!gasUrl) return;
+    const mapels = Object.keys(bankSoal);
+    updateApiStatus(true);
+    try {
+      await callGAS("syncAllMapels", { mapels: mapels });
+      console.log("All mapels synced to GAS");
+    } catch(e) {
+      console.error("Sync all mapels error:", e);
+    }
+    updateApiStatus();
+  }
+  
+  async function loadMapelsFromGAS() {
+    if (!gasUrl) return;
+    try {
+      const response = await fetch(`${gasUrl}?action=getAllMapel`);
+      const result = await response.json();
+      if (result.success && result.mapels) {
+        // Tambahkan mapel dari GAS yang belum ada di localStorage
+        for (let mapel of result.mapels) {
+          if (!bankSoal[mapel]) bankSoal[mapel] = [];
+        }
+        saveToLocal();
+        render();
+      }
+    } catch(e) {
+      console.error("Load mapels from GAS error:", e);
+    }
+  }
+  
   // ========== PARSER SOAL ==========
   function parseSoalDariTeks(rawText) {
-    const delimiter = /===+\s*(SOAL|Soal|soal)\s*\d*\s*===+/gi;
+    const delimiter = /===+\s*(SOAL|Soal|soal|NARASI)\s*\d*\s*===+/gi;
     const blocks = rawText.split(delimiter);
     const soalList = [];
     
     for (let i = 0; i < blocks.length; i++) {
-      if (blocks[i].match(/^===/)) continue;
-      const content = blocks[i].trim();
-      if (content.length > 30) {
+      if (blocks[i] && blocks[i].match(/^===/)) continue;
+      const content = blocks[i]?.trim();
+      if (content && content.length > 30) {
         let tipe = "PG";
         if (content.toLowerCase().includes("narasi")) tipe = "NARASI";
         else if (content.toLowerCase().includes("benar/salah") || content.toLowerCase().includes("pernyataan")) tipe = "BS";
@@ -354,7 +448,7 @@
       }
     }
     
-    if (soalList.length === 0 && rawText.trim().length > 30) {
+    if (soalList.length === 0 && rawText && rawText.trim().length > 30) {
       soalList.push({
         id: nextId++,
         raw: rawText.trim(),
@@ -366,27 +460,33 @@
     return soalList;
   }
   
-  function simpanKeBankSoal(rawText, mapel = currentMapel) {
+  async function simpanKeBankSoal(rawText, mapel = currentMapel) {
     if (!rawText || rawText.trim() === "") return 0;
     const parsed = parseSoalDariTeks(rawText);
     if (!bankSoal[mapel]) bankSoal[mapel] = [];
-    for (let soal of parsed) bankSoal[mapel].push(soal);
-    saveToLocal();
     
-    if (gasUrl) {
-      fetch(gasUrl, {
-        method: "POST", mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "saveSoal", mapel: mapel, soal: soal })
-      }).catch(e => console.log(e));
+    for (let soal of parsed) {
+      bankSoal[mapel].push(soal);
+      // Sync ke GAS
+      if (gasUrl) {
+        await syncMapelToGAS(mapel);
+        await syncSoalToGAS(mapel, soal);
+      }
     }
+    saveToLocal();
     return parsed.length;
   }
   
   function hapusSoal(mapel, id) {
     if (!bankSoal[mapel]) return;
     const index = bankSoal[mapel].findIndex(s => s.id === id);
-    if (index !== -1) { bankSoal[mapel].splice(index, 1); saveToLocal(); render(); }
+    if (index !== -1) { 
+      bankSoal[mapel].splice(index, 1); 
+      saveToLocal(); 
+      render();
+      // Optional: delete from GAS too
+      if (gasUrl) callGAS("deleteSoal", { mapel: mapel, soalId: id });
+    }
   }
   
   // ========== MAPEL ==========
@@ -394,22 +494,38 @@
     const { value } = await Swal.fire({
       title: "Tambah Mapel Baru",
       input: "text",
-      inputPlaceholder: "Contoh: Fisika, Kimia, Ekonomi, Sejarah, Sosiologi",
+      inputPlaceholder: "Contoh: Fisika, Kimia, Ekonomi, Sejarah, Sosiologi, Biologi",
       showCancelButton: true
     });
     if (value && value.trim() && !bankSoal[value.trim()]) {
-      bankSoal[value.trim()] = [];
+      const mapelBaru = value.trim();
+      bankSoal[mapelBaru] = [];
       saveToLocal();
-      currentMapel = value.trim();
+      
+      // Sync ke GAS
+      if (gasUrl) {
+        updateApiStatus(true);
+        await syncMapelToGAS(mapelBaru);
+        updateApiStatus();
+      }
+      
+      currentMapel = mapelBaru;
       render();
-      Swal.fire("Berhasil!", `Mapel ${value} ditambahkan`, "success");
-    } else if (bankSoal[value]) Swal.fire("Gagal", "Mapel sudah ada", "error");
+      Swal.fire("Berhasil!", `Mapel ${mapelBaru} ditambahkan dan tersinkronisasi`, "success");
+    } else if (bankSoal[value]) {
+      Swal.fire("Gagal", "Mapel sudah ada", "error");
+    }
   }
   
   function hapusMapel(mapel) {
     if (mapel === currentMapel) { Swal.fire("Tidak bisa", "Pilih mapel lain dulu", "warning"); return; }
-    Swal.fire({ title: `Hapus ${mapel}?`, text: "Semua soal akan hilang!", icon: "warning", showCancelButton: true }).then(res => {
-      if (res.isConfirmed) { delete bankSoal[mapel]; saveToLocal(); render(); }
+    Swal.fire({ title: `Hapus ${mapel}?`, text: "Semua soal akan hilang!", icon: "warning", showCancelButton: true }).then(async (res) => {
+      if (res.isConfirmed) { 
+        delete bankSoal[mapel]; 
+        saveToLocal(); 
+        render();
+        Swal.fire("Terhapus", `Mapel ${mapel} dihapus`, "success");
+      }
     });
   }
   
@@ -420,13 +536,21 @@
     Object.keys(bankSoal).forEach(m => {
       html += `<div class="mapel-tag ${currentMapel === m ? 'active' : ''}" data-mapel="${m}">${m}<i class="fas fa-times-circle" onclick="event.stopPropagation(); hapusMapel('${m}')"></i></div>`;
     });
-    html += `<button class="btn-add-mapel" id="btnTambahMapel"><i class="fas fa-plus"></i> Tambah Mapel</button></div>`;
+    html += `<button class="btn-add-mapel" id="btnTambahMapel"><i class="fas fa-plus"></i> Tambah Mapel</button>`;
+    if (gasUrl) html += `<button class="btn-add-mapel" id="btnSyncNow" style="border-color:#f9a825;color:#f9a825"><i class="fas fa-sync-alt"></i> Sync ke GAS</button>`;
+    html += `</div>`;
     container.innerHTML = html;
     
     document.querySelectorAll('.mapel-tag').forEach(tag => {
       tag.addEventListener('click', (e) => { if (e.target.tagName !== 'I') { currentMapel = tag.dataset.mapel; render(); } });
     });
     document.getElementById('btnTambahMapel')?.addEventListener('click', tambahMapel);
+    document.getElementById('btnSyncNow')?.addEventListener('click', async () => {
+      updateApiStatus(true);
+      await syncAllMapelsToGAS();
+      updateApiStatus();
+      Swal.fire("Sinkronisasi", "Semua mapel dan soal telah disinkronkan ke Google Sheets", "success");
+    });
   }
   
   // ========== AI GENERATE ==========
@@ -511,7 +635,7 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
     } catch(e) { Swal.close(); Swal.fire("Error", e.message, "error"); }
   }
   
-  // ========== RENDER MANUAL FORM (SEMUA TIPE) ==========
+  // ========== RENDER MANUAL FORM ==========
   let manualFormType = "pg";
   
   function renderManualForm() {
@@ -624,7 +748,7 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
     container.innerHTML = html;
   };
   
-  function simpanManual() {
+  async function simpanManual() {
     const tipe = manualFormType;
     let rawText = "";
     
@@ -676,8 +800,10 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
       rawText = teks;
     }
     
-    const jumlah = simpanKeBankSoal(rawText, currentMapel);
-    if (jumlah > 0) Swal.fire("Tersimpan!", `${jumlah} soal disimpan ke ${currentMapel}`, "success");
+    updateApiStatus(true);
+    const jumlah = await simpanKeBankSoal(rawText, currentMapel);
+    updateApiStatus();
+    if (jumlah > 0) Swal.fire("Tersimpan!", `${jumlah} soal disimpan ke ${currentMapel} dan tersinkronisasi`, "success");
     else Swal.fire("Kosong", "Isi soal terlebih dahulu", "warning");
   }
   
@@ -712,9 +838,11 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
       `;
       renderMapelTags("mapelTagsGen");
       document.getElementById("btnGenerateAI")?.addEventListener("click", generateSoalAI);
-      document.getElementById("btnSimpanHasil")?.addEventListener("click", () => {
+      document.getElementById("btnSimpanHasil")?.addEventListener("click", async () => {
         const teks = document.getElementById("aiResult").innerText;
-        const jml = simpanKeBankSoal(teks, currentMapel);
+        updateApiStatus(true);
+        const jml = await simpanKeBankSoal(teks, currentMapel);
+        updateApiStatus();
         if (jml > 0) { Swal.fire("Tersimpan!", `${jml} soal ke ${currentMapel}`, "success"); document.getElementById("aiResult").innerText = ""; }
       });
     }
@@ -774,7 +902,15 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
           const soal = bankSoal[currentMapel].find(s => s.id === id);
           if (soal) {
             const { value } = await Swal.fire({ title: "Edit Soal", input: "textarea", inputValue: soal.raw, inputAttributes: { style: "height:300px;font-family:monospace" }, showCancelButton: true });
-            if (value) { soal.raw = value; soal.createdAt = new Date().toISOString(); saveToLocal(); render(); Swal.fire("Tersimpan!"); }
+            if (value) { 
+              soal.raw = value; 
+              soal.createdAt = new Date().toISOString(); 
+              saveToLocal(); 
+              // Sync update ke GAS
+              if (gasUrl) await syncSoalToGAS(currentMapel, soal);
+              render(); 
+              Swal.fire("Tersimpan!"); 
+            }
           }
         });
       });
@@ -793,8 +929,13 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
         <div class="card">
           <h2><i class="fas fa-cog"></i> Settings</h2>
           <div class="form-group"><label><i class="fab fa-google"></i> Gemini API Key</label><input id="settingsApiKey" value="${apiKey}" placeholder="AIzaSy..."><small>Dapatkan di <a href="https://aistudio.google.com" target="_blank">AI Studio Google</a></small></div>
-          <div class="form-group"><label><i class="fas fa-cloud-upload-alt"></i> Google Apps Script URL</label><input id="settingsGasUrl" value="${gasUrl}" placeholder="https://script.google.com/macros/s/.../exec"><small>Isi jika ingin sync ke Google Sheets</small></div>
-          <div class="flex-row"><button id="btnSaveSettings" class="btn-primary">Simpan</button><button id="btnTestGas" class="btn-outline">Test GAS</button></div>
+          <div class="form-group"><label><i class="fas fa-cloud-upload-alt"></i> Google Apps Script URL</label><input id="settingsGasUrl" value="${gasUrl}" placeholder="https://script.google.com/macros/s/.../exec"><small>Isi URL Web App dari GAS untuk sync ke Google Sheets</small></div>
+          <div class="flex-row">
+            <button id="btnSaveSettings" class="btn-primary">Simpan</button>
+            <button id="btnTestGas" class="btn-outline">Test GAS</button>
+            <button id="btnLoadFromGAS" class="btn-outline">Load Mapel dari GAS</button>
+            <button id="btnSyncAll" class="btn-sync">Sync Semua ke GAS</button>
+          </div>
         </div>
       `;
       document.getElementById("btnSaveSettings")?.addEventListener("click", () => {
@@ -802,18 +943,33 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
         gasUrl = document.getElementById("settingsGasUrl").value;
         saveToLocal();
         updateApiStatus();
-        Swal.fire("Tersimpan!");
+        Swal.fire("Tersimpan!", "API Key dan GAS URL disimpan", "success");
       });
       document.getElementById("btnTestGas")?.addEventListener("click", async () => {
         if (!gasUrl) { Swal.fire("GAS URL kosong"); return; }
-        try { await fetch(gasUrl, { method: "GET", mode: "no-cors" }); Swal.fire("Test", "Request dikirim", "info"); } catch(e) { Swal.fire("Error", e.message, "error"); }
+        try { 
+          const response = await fetch(gasUrl, { method: "GET" }); 
+          Swal.fire("Test", "GAS merespons! Status: " + response.status, "info"); 
+        } catch(e) { Swal.fire("Error", e.message, "error"); }
+      });
+      document.getElementById("btnLoadFromGAS")?.addEventListener("click", async () => {
+        updateApiStatus(true);
+        await loadMapelsFromGAS();
+        updateApiStatus();
+        Swal.fire("Selesai", "Mapel dari GAS telah dimuat", "success");
+      });
+      document.getElementById("btnSyncAll")?.addEventListener("click", async () => {
+        updateApiStatus(true);
+        await syncAllMapelsToGAS();
+        updateApiStatus();
+        Swal.fire("Selesai", "Semua data telah disinkronkan ke Google Sheets", "success");
       });
     }
   }
   
   function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
   
-  // ========== NAVIGASI ==========
+  // ========== INIT & NAVIGASI ==========
   document.querySelectorAll(".nav-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
@@ -825,6 +981,11 @@ Jangan tambahkan teks di luar format soal. Langsung soal saja.`;
   
   loadFromLocal();
   render();
+  
+  // Load mapels from GAS on startup if URL exists
+  if (gasUrl) {
+    setTimeout(() => loadMapelsFromGAS(), 1000);
+  }
 </script>
 </body>
 </html>
