@@ -3,382 +3,400 @@
 <head>
   <meta charset='UTF-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=yes'>
-  <meta name='theme-color' content='#0d5c3f'>
-  <title>ExamForge Pro | AI CBT Platform</title>
-  
-  <!-- Font Awesome 6 (Gratis) -->
+  <title>Exam-Generator Pro | Manual + AI + Gambar</title>
+  <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap' rel='stylesheet'>
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'>
-  
-  <!-- Google Fonts -->
-  <link href='https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap' rel='stylesheet'>
-  
-  <!-- SweetAlert2 -->
   <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-  
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
-    
-    body {
-      background: linear-gradient(135deg, #d4f5e8 0%, #a8e6cf 50%, #7bc5ae 100%);
-      min-height: 100vh;
-      display: flex;
-    }
-    
-    /* ========== SIDEBAR MODERN ========== */
-    .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, #0a3d2e 0%, #0b4a38 50%, #0a3d2e 100%);
-      backdrop-filter: blur(10px);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      padding: 28px 20px;
-      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.15);
-      transition: all 0.3s ease;
-      z-index: 20;
-      overflow-y: auto;
-    }
-    
-    .logo {
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin-bottom: 40px;
-      background: linear-gradient(135deg, #d4ffb0, #88e0b0);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .logo i {
-      font-size: 2rem;
-      background: linear-gradient(135deg, #ffffff, #b8f0d0);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 18px;
-      margin: 6px 0;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      font-weight: 500;
-      color: #d4f5e8;
-    }
-    
-    .nav-item i {
-      width: 28px;
-      font-size: 1.2rem;
-    }
-    
-    .nav-item.active {
-      background: linear-gradient(135deg, #2a9d6e, #1b7a52);
-      color: white;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      transform: translateX(5px);
-    }
-    
-    .nav-item:hover:not(.active) {
-      background: rgba(42, 157, 110, 0.4);
-      transform: translateX(5px);
-    }
-    
-    /* ========== MAIN PANEL ========== */
-    .main-panel {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px 32px;
-    }
-    
-    /* ========== CARD MODERN ========== */
-    .card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(4px);
-      border-radius: 32px;
-      padding: 28px;
-      margin-bottom: 28px;
-      box-shadow: 0 20px 40px rgba(0, 32, 0, 0.1);
-      border: 1px solid rgba(100, 180, 120, 0.3);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 24px 48px rgba(0, 32, 0, 0.15);
-    }
-    
-    /* ========== BUTTON STYLE ========== */
-    .btn {
-      border: none;
-      padding: 10px 24px;
-      border-radius: 40px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #2e7d32, #1b5e20);
-      color: white;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-    
-    .btn-primary:hover {
-      transform: scale(0.98);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-warning {
-      background: linear-gradient(135deg, #f9a825, #f57c00);
-      color: white;
-    }
-    
-    .btn-danger {
-      background: linear-gradient(135deg, #d32f2f, #c62828);
-      color: white;
-    }
-    
-    .btn-outline {
-      background: transparent;
-      border: 2px solid #2e7d32;
-      color: #1b5e20;
-    }
-    
-    .btn-outline:hover {
-      background: #2e7d32;
-      color: white;
-    }
-    
-    /* ========== FORM ELEMENTS ========== */
-    input, select, textarea {
-      width: 100%;
-      padding: 12px 18px;
-      border-radius: 28px;
-      border: 1.5px solid #cfe3cf;
-      background: white;
-      margin-top: 6px;
-      margin-bottom: 16px;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #2e7d32;
-      box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
-    }
-    
-    label {
-      font-weight: 600;
-      color: #1c4d2d;
-      margin-top: 8px;
-      margin-bottom: 4px;
-      display: block;
-    }
-    
-    /* ========== UTILITY ========== */
-    .flex-row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    
-    .grid-2col {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-    }
-    
-    .soal-item {
-      border-left: 5px solid #2e7d32;
-      padding: 16px 20px;
-      margin: 16px 0;
-      background: linear-gradient(135deg, #f9fff9, #f0faf0);
-      border-radius: 20px;
-      transition: all 0.2s;
-    }
-    
-    .soal-item:hover {
-      transform: translateX(5px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-    
-    .soal-editor {
-      background: #fffbe6;
-      border-radius: 24px;
-      padding: 20px;
-      border-left: 6px solid #2e7d32;
-      font-family: monospace;
-      white-space: pre-wrap;
-      max-height: 360px;
-      overflow: auto;
-      font-size: 13px;
-    }
-    
-    .option-with-img {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 10px 0;
-      flex-wrap: wrap;
-    }
-    
-    .option-with-img input {
-      margin-bottom: 0;
-      flex: 1;
-    }
-    
-    .subsoal-form {
-      background: #f5f9f5;
-      padding: 18px;
-      border-radius: 20px;
-      margin: 16px 0;
-    }
-    
-    .gambar-preview {
-      max-width: 100px;
-      max-height: 80px;
-      margin-top: 8px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .badge {
-      background: linear-gradient(135deg, #2e7d32, #1b5e20);
-      color: white;
-      padding: 4px 12px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    
-    /* ========== RESPONSIVE ========== */
-    @media (max-width: 800px) {
-      .sidebar {
-        width: 80px;
-        padding: 20px 12px;
-      }
-      .sidebar .logo span, .nav-item span {
-        display: none;
-      }
-      .main-panel {
-        padding: 16px;
-      }
-      .option-with-img {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: #e8f3e8; display: flex; height: 100vh; overflow: hidden; }
+    .sidebar { width: 260px; background: #0b3b2f; color: white; padding: 24px 16px; overflow-y: auto; }
+    .sidebar .logo { font-size: 1.5rem; font-weight: bold; margin-bottom: 32px; }
+    .nav-item { padding: 12px 16px; margin: 4px 0; border-radius: 16px; cursor: pointer; display: flex; gap: 12px; align-items: center; }
+    .nav-item.active, .nav-item:hover { background: #1e6f5c; }
+    .main-panel { flex: 1; overflow-y: auto; padding: 24px; background: #f0faf0; }
+    .card { background: white; border-radius: 28px; padding: 24px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+    .btn { padding: 10px 20px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+    .btn-primary { background: #2e7d32; color: white; }
+    .btn-warning { background: #f9a825; color: #1e2a1e; }
+    .btn-danger { background: #d32f2f; color: white; }
+    .btn-outline { background: transparent; border: 1px solid #2e7d32; color: #2e7d32; }
+    input, select, textarea { width: 100%; padding: 10px 14px; border-radius: 24px; border: 1px solid #ccc; margin: 6px 0 12px; }
+    .flex-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .soal-item { border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0; background: #f9fff9; border-radius: 16px; }
+    .soal-editor { background: #fff8e7; border-radius: 24px; padding: 18px; border-left: 8px solid #2e7d32; font-family: monospace; white-space: pre-wrap; max-height: 320px; overflow: auto; }
+    .subsoal-form { background: #f5f5f5; padding: 16px; border-radius: 16px; margin: 12px 0; }
+    .gambar-preview { max-width: 100px; max-height: 80px; margin-top: 8px; border-radius: 8px; }
+    .option-with-img { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+    @media (max-width: 700px) { .sidebar { width: 70px; } .sidebar span { display: none; } .grid-2col { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-
-<div class="sidebar" id="sidebar">
-  <div class="logo">
-    <i class="fas fa-brain"></i>
-    <span>ExamForge</span>
-  </div>
-  <div class="nav-item active" data-menu="manual">
-    <i class="fas fa-pen-alt"></i>
-    <span>Buat Soal Manual</span>
-  </div>
-  <div class="nav-item" data-menu="ai-generate">
-    <i class="fas fa-microchip"></i>
-    <span>AI Generate</span>
-  </div>
-  <div class="nav-item" data-menu="bank">
-    <i class="fas fa-database"></i>
-    <span>Bank Soal</span>
-  </div>
-  <div class="nav-item" data-menu="maker">
-    <i class="fas fa-sliders-h"></i>
-    <span>Test Maker</span>
-  </div>
-  <div class="nav-item" data-menu="cbt">
-    <i class="fas fa-laptop-code"></i>
-    <span>Zona CBT</span>
-  </div>
-  <div class="nav-item" data-menu="settings">
-    <i class="fas fa-cog"></i>
-    <span>Settings</span>
-  </div>
+<div class="sidebar">
+  <div class="logo"><i class="fas fa-brain"></i> <span>ExamForge</span></div>
+  <div class="nav-item active" data-menu="manual"><i class="fas fa-pen-alt"></i> <span>Buat Soal Manual</span></div>
+  <div class="nav-item" data-menu="ai-generate"><i class="fas fa-robot"></i> <span>AI Generate</span></div>
+  <div class="nav-item" data-menu="bank"><i class="fas fa-database"></i> <span>Bank Soal</span></div>
+  <div class="nav-item" data-menu="maker"><i class="fas fa-edit"></i> <span>Test Maker</span></div>
+  <div class="nav-item" data-menu="cbt"><i class="fas fa-laptop"></i> <span>CBT</span></div>
+  <div class="nav-item" data-menu="settings"><i class="fas fa-cog"></i> <span>Settings</span></div>
 </div>
-
 <div class="main-panel" id="mainPanel"></div>
 
 <script>
-  // ========== STATE GLOBAL ==========
+  // ========== STATE ==========
   let bankSoal = JSON.parse(localStorage.getItem('bankSoalFull') || `{
     "Matematika": [],
     "IPA": [],
     "Bahasa Inggris": []
   }`);
-  
   let currentMapel = "Matematika";
   let examSettings = JSON.parse(localStorage.getItem('examSettingsCplx') || '{}');
-  let apiKeys = JSON.parse(localStorage.getItem("apiKeys") || `{ "gemini": "", "groq": "" }`);
-  let gasUrl = localStorage.getItem('gasUrl') || '';
-  
-  let cbtState = {
-    loggedIn: false,
-    siswa: null,
-    soalList: [],
-    jawaban: [],
-    ragu: [],
-    currentIndex: 0,
-    waktuSisa: 0,
-    timerInterval: null
-  };
-  
+  let apiKeys = JSON.parse(localStorage.getItem("apiKeys") || `{ "gemini": "", "groq": "", "guru": "Guru Digital" }`);
+
   function saveBank() { localStorage.setItem('bankSoalFull', JSON.stringify(bankSoal)); }
-  function saveSettings() { 
-    localStorage.setItem('examSettingsCplx', JSON.stringify(examSettings)); 
-    localStorage.setItem("apiKeys", JSON.stringify(apiKeys));
-    localStorage.setItem('gasUrl', gasUrl);
+  function saveSettings() { localStorage.setItem('examSettingsCplx', JSON.stringify(examSettings)); localStorage.setItem("apiKeys", JSON.stringify(apiKeys)); }
+
+  // ========== RENDER MANUAL (DENGAN GAMBAR) ==========
+  function renderManual() {
+    return `
+      <div class="card">
+        <h2><i class="fas fa-hand-paper"></i> Buat Soal Manual (Dengan Gambar)</h2>
+        <label>Pilih Mapel</label>
+        <select id="manualMapel">${Object.keys(bankSoal).map(m => `<option value="${m}">${m}</option>`).join('')}</select>
+        
+        <label>Tipe Soal</label>
+        <select id="manualTipe" onchange="toggleManualForm()">
+          <option value="pg">Pilihan Ganda Biasa (A-D / A-E)</option>
+          <option value="pgk">Pilihan Ganda Kompleks (Jawaban >1)</option>
+          <option value="narasi">Narasi (1 Narasi untuk 3-5 Soal)</option>
+          <option value="bs">Benar/Salah (5 Pernyataan)</option>
+          <option value="stts">Setuju/Tidak Setuju (INK Model)</option>
+          <option value="cukup">Kecukupan Data + Gambar di Opsi</option>
+        </select>
+
+        <div id="manualFormArea"></div>
+        
+        <button id="simpanManualBtn" class="btn-primary" style="margin-top:16px"><i class="fas fa-save"></i> Simpan ke Bank Soal</button>
+      </div>
+    `;
   }
-  
-  // ========== GAS INTEGRATION ==========
-  async function callGAS(action, data = {}) {
-    if (!gasUrl) return { success: false, error: 'GAS URL belum diisi' };
-    try {
-      const response = await fetch(gasUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, ...data })
+
+  function toggleManualForm() {
+    const tipe = document.getElementById('manualTipe').value;
+    const area = document.getElementById('manualFormArea');
+    if (!area) return;
+    
+    if (tipe === 'pg') {
+      area.innerHTML = `
+        <label>Teks Soal</label><textarea id="pgTeks" rows="2" placeholder="Masukkan pertanyaan"></textarea>
+        <label>Gambar Soal (URL)</label><input id="pgGambar" placeholder="https://...">
+        <label>Jumlah Opsi</label><select id="pgJmlOpsi" onchange="renderPGOptions()"><option value="4">A-D (SD/SMP)</option><option value="5">A-E (SMA)</option></select>
+        <div id="pgOptionsArea"></div>
+        <label>Jawaban Benar (bisa lebih dari 1, pisah koma)</label><input id="pgJawaban" placeholder="Contoh: 0,2 (artinya A dan C)">
+      `;
+      renderPGOptions();
+    }
+    else if (tipe === 'pgk') {
+      area.innerHTML = `
+        <label>Teks Soal</label><textarea id="pgkTeks" rows="2"></textarea>
+        <label>Gambar Soal (URL)</label><input id="pgkGambar" placeholder="https://...">
+        <div id="pgkOptionsArea"></div>
+        <label>Jawaban Benar (pisah koma, contoh: 0,2,3)</label><input id="pgkJawaban" placeholder="Index opsi yang benar">
+      `;
+      renderPGKOptions();
+    }
+    else if (tipe === 'narasi') {
+      area.innerHTML = `
+        <label>Teks Narasi</label><textarea id="narasiTeks" rows="4" placeholder="Bacaan panjang untuk 3-5 soal"></textarea>
+        <label>Gambar Narasi (URL)</label><input id="narasiGambar" placeholder="https://...">
+        <label>Jumlah Soal dalam Narasi</label><input id="narasiJml" type="number" value="3" min="1" max="5" onchange="renderSubSoalForms()">
+        <div id="subSoalContainer"></div>
+      `;
+      renderSubSoalForms();
+    }
+    else if (tipe === 'bs') {
+      area.innerHTML = `
+        <label>Teks Narasi</label><textarea id="bsNarasi" rows="3"></textarea>
+        <label>Gambar (URL)</label><input id="bsGambar" placeholder="https://...">
+        <div id="bsPernyataanContainer"></div>
+        <label>Kunci Jawaban (B/S, pisah koma)</label><input id="bsKunci" placeholder="B,S,B,S,B">
+      `;
+      renderBSPernyataan();
+    }
+    else if (tipe === 'stts') {
+      area.innerHTML = `
+        <label>Teks Narasi</label><textarea id="sttsNarasi" rows="3"></textarea>
+        <label>Gambar (URL)</label><input id="sttsGambar" placeholder="https://...">
+        <div id="sttsPernyataanContainer"></div>
+      `;
+      renderSTTSPernyataan();
+    }
+    else if (tipe === 'cukup') {
+      area.innerHTML = `
+        <label>Teks Pertanyaan</label><textarea id="cukupTeks" rows="2"></textarea>
+        <label>Pernyataan A</label><textarea id="cukupA" rows="2" placeholder="Pernyataan A"></textarea>
+        <label>Gambar untuk Opsi A (URL)</label><input id="cukupAGambar" placeholder="https://...">
+        <label>Pernyataan B</label><textarea id="cukupB" rows="2" placeholder="Pernyataan B"></textarea>
+        <label>Gambar untuk Opsi B (URL)</label><input id="cukupBGambar" placeholder="https://...">
+        <label>Gambar untuk Opsi C (URL)</label><input id="cukupCGambar" placeholder="https://...">
+        <label>Gambar untuk Opsi D (URL)</label><input id="cukupDGambar" placeholder="https://...">
+        <label>Kunci Jawaban (A/B/C/D)</label><select id="cukupKunci"><option value="A">A. Pernyataan A saja cukup</option><option value="B">B. Pernyataan B saja cukup</option><option value="C">C. A dan B cukup</option><option value="D">D. A dan B tidak cukup</option></select>
+      `;
+    }
+  }
+
+  function renderPGOptions() {
+    const jml = parseInt(document.getElementById('pgJmlOpsi').value);
+    const container = document.getElementById('pgOptionsArea');
+    if (!container) return;
+    let html = '<label>Opsi Jawaban + Gambar</label>';
+    for (let i = 0; i < jml; i++) {
+      const huruf = String.fromCharCode(65 + i);
+      html += `
+        <div class="option-with-img">
+          <strong>${huruf}.</strong>
+          <input type="text" id="pgOpt${i}" placeholder="Teks opsi ${huruf}" style="flex:1">
+          <input type="text" id="pgOptImg${i}" placeholder="URL gambar (opsional)" style="width:150px">
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+
+  function renderPGKOptions() {
+    const container = document.getElementById('pgkOptionsArea');
+    if (!container) return;
+    let html = '<label>Opsi Jawaban (A-D)</label>';
+    for (let i = 0; i < 4; i++) {
+      const huruf = String.fromCharCode(65 + i);
+      html += `
+        <div class="option-with-img">
+          <strong>${huruf}.</strong>
+          <input type="text" id="pgkOpt${i}" placeholder="Teks opsi ${huruf}" style="flex:1">
+          <input type="text" id="pgkOptImg${i}" placeholder="URL gambar" style="width:150px">
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+
+  function renderSubSoalForms() {
+    const jml = parseInt(document.getElementById('narasiJml').value) || 3;
+    const container = document.getElementById('subSoalContainer');
+    if (!container) return;
+    let html = '<h4>Soal-soal dalam Narasi</h4>';
+    for (let i = 0; i < jml; i++) {
+      html += `
+        <div class="subsoal-form">
+          <strong>Soal ${i+1}</strong>
+          <input type="text" id="subTeks${i}" placeholder="Pertanyaan soal ${i+1}">
+          <div class="flex-row">
+            <input type="text" id="subOptA${i}" placeholder="Opsi A" style="width:30%">
+            <input type="text" id="subOptB${i}" placeholder="Opsi B" style="width:30%">
+            <input type="text" id="subOptC${i}" placeholder="Opsi C" style="width:30%">
+            <input type="text" id="subOptD${i}" placeholder="Opsi D" style="width:30%">
+          </div>
+          <label>Jawaban Benar</label><select id="subJawaban${i}"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+
+  function renderBSPernyataan() {
+    const container = document.getElementById('bsPernyataanContainer');
+    if (!container) return;
+    let html = '<h4>5 Pernyataan Benar/Salah</h4>';
+    for (let i = 0; i < 5; i++) {
+      html += `<input type="text" id="bsPernyataan${i}" placeholder="Pernyataan ${i+1}" style="margin:6px 0">`;
+    }
+    container.innerHTML = html;
+  }
+
+  function renderSTTSPernyataan() {
+    const container = document.getElementById('sttsPernyataanContainer');
+    if (!container) return;
+    let html = '<h4>5 Pernyataan (Setuju/Tidak Setuju)</h4>';
+    for (let i = 0; i < 5; i++) {
+      html += `<input type="text" id="sttsPernyataan${i}" placeholder="Pernyataan ${i+1}" style="margin:6px 0">`;
+    }
+    container.innerHTML = html;
+  }
+
+  // Simpan Manual
+  function simpanManual() {
+    const mapel = document.getElementById('manualMapel').value;
+    const tipe = document.getElementById('manualTipe').value;
+    
+    if (tipe === 'pg') {
+      const teks = document.getElementById('pgTeks').value;
+      const gambar = document.getElementById('pgGambar').value;
+      const jml = parseInt(document.getElementById('pgJmlOpsi').value);
+      const opsi = [];
+      for (let i = 0; i < jml; i++) {
+        opsi.push({
+          label: String.fromCharCode(65+i),
+          teks: document.getElementById(`pgOpt${i}`)?.value || '',
+          gambar: document.getElementById(`pgOptImg${i}`)?.value || ''
+        });
+      }
+      const jawabanRaw = document.getElementById('pgJawaban').value;
+      const jawaban = jawabanRaw.split(',').map(Number);
+      bankSoal[mapel].push({ tipe: 'PG', teks, gambar, opsi, jawaban, multi: jawaban.length > 1 });
+    }
+    else if (tipe === 'pgk') {
+      const teks = document.getElementById('pgkTeks').value;
+      const gambar = document.getElementById('pgkGambar').value;
+      const opsi = [];
+      for (let i = 0; i < 4; i++) {
+        opsi.push({
+          label: String.fromCharCode(65+i),
+          teks: document.getElementById(`pgkOpt${i}`)?.value || '',
+          gambar: document.getElementById(`pgkOptImg${i}`)?.value || ''
+        });
+      }
+      const jawaban = document.getElementById('pgkJawaban').value.split(',').map(Number);
+      bankSoal[mapel].push({ tipe: 'PGK', teks, gambar, opsi, jawaban, multi: true });
+    }
+    else if (tipe === 'narasi') {
+      const narasi = document.getElementById('narasiTeks').value;
+      const gambar = document.getElementById('narasiGambar').value;
+      const jml = parseInt(document.getElementById('narasiJml').value);
+      const soalList = [];
+      for (let i = 0; i < jml; i++) {
+        soalList.push({
+          teks: document.getElementById(`subTeks${i}`)?.value || '',
+          opsi: [
+            document.getElementById(`subOptA${i}`)?.value || '',
+            document.getElementById(`subOptB${i}`)?.value || '',
+            document.getElementById(`subOptC${i}`)?.value || '',
+            document.getElementById(`subOptD${i}`)?.value || ''
+          ],
+          jawaban: [document.getElementById(`subJawaban${i}`)?.value || 'A']
+        });
+      }
+      bankSoal[mapel].push({ tipe: 'NARASI', narasi, gambar, soalList });
+    }
+    else if (tipe === 'bs') {
+      const narasi = document.getElementById('bsNarasi').value;
+      const gambar = document.getElementById('bsGambar').value;
+      const pernyataan = [];
+      for (let i = 0; i < 5; i++) {
+        pernyataan.push(document.getElementById(`bsPernyataan${i}`)?.value || '');
+      }
+      const kunci = document.getElementById('bsKunci').value.split(',');
+      bankSoal[mapel].push({ tipe: 'BS', teks: narasi, gambar, pernyataan, kunci });
+    }
+    else if (tipe === 'stts') {
+      const narasi = document.getElementById('sttsNarasi').value;
+      const gambar = document.getElementById('sttsGambar').value;
+      const pernyataan = [];
+      for (let i = 0; i < 5; i++) {
+        pernyataan.push(document.getElementById(`sttsPernyataan${i}`)?.value || '');
+      }
+      bankSoal[mapel].push({ tipe: 'STTS', teks: narasi, gambar, pernyataan });
+    }
+    else if (tipe === 'cukup') {
+      bankSoal[mapel].push({
+        tipe: 'CUKUP',
+        teks: document.getElementById('cukupTeks').value,
+        pernyataanA: document.getElementById('cukupA').value,
+        pernyataanB: document.getElementById('cukupB').value,
+        opsiGambar: {
+          A: document.getElementById('cukupAGambar').value,
+          B: document.getElementById('cukupBGambar').value,
+          C: document.getElementById('cukupCGambar').value,
+          D: document.getElementById('cukupDGambar').value
+        },
+        kunci: document.getElementById('cukupKunci').value
       });
-      return await response.json();
-    } catch (e) {
-      return { success: false, error: e.message };
     }
+    
+    saveBank();
+    Swal.fire('Tersimpan!', `Soal ${tipe} ditambahkan ke ${mapel}`, 'success');
   }
-  
-  async function pushSoalToGAS(mapel, soal) {
-    const result = await callGAS('saveBankSoal', { mapel, soal });
-    if (result.success) {
-      Swal.fire('Tersimpan ke Google Sheets', '', 'success');
-      return true;
-    }
-    return false;
+
+  // ========== AI GENERATE (dengan dukungan gambar rekomendasi) ==========
+  async function callAIGenerate(prompt, tipeSoalTarget) {
+    let apiKey = apiKeys.gemini;
+    if (!apiKey) { Swal.fire("Error", "API Key Gemini belum diisi"); return null; }
+    let endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
+    
+    let instruction = `Buatkan soal ujian dengan format JSON, termasuk rekomendasi URL gambar (unsplash atau placeholder) untuk soal dan opsi jika relevan.
+Konteks: ${prompt.substring(0, 1500)}
+Tipe soal: ${tipeSoalTarget}
+
+Format JSON output HARUS seperti contoh:
+{
+  "tipe": "PG",
+  "teks": "Pertanyaan soal?",
+  "gambar_soal": "https://picsum.photos/id/1/200/150",
+  "opsi": [
+    {"label": "A", "teks": "Opsi A", "gambar": "https://..."},
+    {"label": "B", "teks": "Opsi B", "gambar": ""}
+  ],
+  "jawaban": [0]
+}
+
+Untuk tipe NARASI:
+{
+  "tipe": "NARASI",
+  "narasi": "Teks bacaan...",
+  "gambar_narasi": "https://...",
+  "soalList": [
+    {"teks": "Soal 1?", "opsi": ["A1","B1","C1","D1"], "jawaban": ["A"]}
+  ]
+}
+
+Hanya output JSON, tanpa teks lain.`;
+
+    try {
+      const payload = { contents: [{ parts: [{ text: instruction }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 2048 } };
+      const resp = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+      return data.candidates[0].content.parts[0].text;
+    } catch (err) { Swal.fire("API Error", err.message); return null; }
   }
-  
-  // ========== RENDER UTAMA ==========
+
+  function renderAIGenerate() {
+    return `
+      <div class="card">
+        <h2><i class="fas fa-microchip"></i> AI Generate Soal + Rekomendasi Gambar</h2>
+        <label>Target Mapel</label>
+        <select id="aiMapel">${Object.keys(bankSoal).map(m => `<option value="${m}">${m}</option>`).join('')}</select>
+        <label>Tipe Soal</label>
+        <select id="aiTipe">
+          <option value="PG">Pilihan Ganda</option>
+          <option value="PGK">PG Kompleks</option>
+          <option value="NARASI">Narasi (3-5 soal)</option>
+          <option value="BS">Benar/Salah</option>
+          <option value="STTS">Setuju/Tidak Setuju</option>
+          <option value="CUKUP">Kecukupan Data</option>
+        </select>
+        <label>Prompt Materi</label>
+        <textarea id="aiPrompt" rows="4" placeholder="Contoh: Buat soal tentang fotosintesis kelas 8, sertakan rekomendasi gambar"></textarea>
+        <button id="genAIBtn" class="btn-primary"><i class="fas fa-magic"></i> Generate Soal + Gambar</button>
+        <label>Hasil Generate (JSON - bisa diedit)</label>
+        <div id="aiResultEditor" contenteditable="true" class="soal-editor" style="min-height:200px;">Hasil AI akan muncul disini (format JSON)</div>
+        <button id="simpanAIKeBank" class="btn-primary" style="margin-top:12px">Simpan ke Bank Soal</button>
+      </div>
+    `;
+  }
+
+  // ========== RENDER BANK, MAKER, CBT, SETTINGS (SEDERHANA) ==========
+  function renderBankSoal() {
+    return `<div class="card"><h2>Bank Soal</h2><pre>${JSON.stringify(bankSoal, null, 2)}</pre></div>`;
+  }
+  function renderTestMaker() { return `<div class="card"><h2>Test Maker</h2><p>Pengaturan ujian menyusul</p></div>`; }
+  function renderCBT() { return `<div class="card"><h2>CBT Mode</h2><p>Fitur CBT akan aktif setelah bank soal berisi data</p></div>`; }
+  function renderSettings() {
+    return `<div class="card"><h2>Settings API</h2><label>Gemini Key</label><input id="geminiKey" value="${apiKeys.gemini}"><button id="saveApiBtn" class="btn-primary">Simpan</button></div>`;
+  }
+
+  // ========== NAVIGASI & EVENT ==========
   function render() {
     const menu = document.querySelector('.nav-item.active')?.dataset.menu || 'manual';
     const panel = document.getElementById('mainPanel');
@@ -388,339 +406,48 @@
     else if (menu === 'maker') panel.innerHTML = renderTestMaker();
     else if (menu === 'cbt') panel.innerHTML = renderCBT();
     else if (menu === 'settings') panel.innerHTML = renderSettings();
-    attachEvents();
-  }
-  
-  // ========== MANUAL SOAL MAKER ==========
-  function renderManual() {
-    return `
-      <div class="card">
-        <h2><i class="fas fa-hand-paper"></i> Buat Soal Manual + Gambar</h2>
-        <div class="grid-2col">
-          <div>
-            <label><i class="fas fa-folder"></i> Mapel</label>
-            <select id="manualMapel">${Object.keys(bankSoal).map(m => `<option value="${m}">${m}</option>`).join('')}</select>
-            <label><i class="fas fa-question-circle"></i> Tipe Soal</label>
-            <select id="manualTipe" onchange="toggleManualForm()">
-              <option value="pg">Pilihan Ganda Biasa (A-D / A-E)</option>
-              <option value="pgk">Pilihan Ganda Kompleks (Jawaban >1)</option>
-              <option value="narasi">Narasi (1 Narasi untuk 3-5 Soal)</option>
-              <option value="bs">Benar/Salah (5 Pernyataan)</option>
-              <option value="stts">Setuju/Tidak Setuju (INK)</option>
-              <option value="cukup">Kecukupan Data + Gambar Opsi</option>
-            </select>
-          </div>
-          <div id="manualFormArea"></div>
-        </div>
-        <div class="flex-row" style="margin-top:20px">
-          <button id="simpanManualBtn" class="btn-primary"><i class="fas fa-save"></i> Simpan ke Bank Soal</button>
-        </div>
-      </div>
-    `;
-  }
-  
-  window.toggleManualForm = function() {
-    const tipe = document.getElementById('manualTipe')?.value;
-    const area = document.getElementById('manualFormArea');
-    if (!area) return;
     
-    if (tipe === 'pg') {
-      area.innerHTML = `
-        <label><i class="fas fa-quote-left"></i> Teks Soal</label><textarea id="pgTeks" rows="2" placeholder="Masukkan pertanyaan"></textarea>
-        <label><i class="fas fa-image"></i> Gambar Soal (URL)</label><input id="pgGambar" placeholder="https://...">
-        <label>Jumlah Opsi</label><select id="pgJmlOpsi" onchange="renderPGOptions()"><option value="4">A-D (SD/SMP)</option><option value="5">A-E (SMA)</option></select>
-        <div id="pgOptionsArea"></div>
-        <label><i class="fas fa-check-double"></i> Jawaban Benar (pisah koma, contoh: 0,2)</label><input id="pgJawaban" placeholder="Index opsi: 0,1,2">
-      `;
-      renderPGOptions();
-    } 
-    else if (tipe === 'pgk') {
-      area.innerHTML = `
-        <label>Teks Soal</label><textarea id="pgkTeks" rows="2"></textarea>
-        <label>Gambar Soal</label><input id="pgkGambar" placeholder="https://...">
-        <div id="pgkOptionsArea"></div>
-        <label>Jawaban Benar (pisah koma)</label><input id="pgkJawaban" placeholder="0,2">
-      `;
-      renderPGKOptions();
+    if (menu === 'manual') {
+      toggleManualForm();
+      document.getElementById('simpanManualBtn')?.addEventListener('click', simpanManual);
+      document.getElementById('manualTipe')?.addEventListener('change', toggleManualForm);
+      window.renderPGOptions = renderPGOptions;
+      window.renderPGKOptions = renderPGKOptions;
+      window.renderSubSoalForms = renderSubSoalForms;
+      window.renderBSPernyataan = renderBSPernyataan;
+      window.renderSTTSPernyataan = renderSTTSPernyataan;
+      window.toggleManualForm = toggleManualForm;
     }
-    else if (tipe === 'narasi') {
-      area.innerHTML = `
-        <label>Teks Narasi</label><textarea id="narasiTeks" rows="4" placeholder="Bacaan untuk 3-5 soal"></textarea>
-        <label>Gambar Narasi</label><input id="narasiGambar" placeholder="https://...">
-        <label>Jumlah Soal</label><input id="narasiJml" type="number" value="3" min="1" max="5" onchange="renderSubSoalForms()">
-        <div id="subSoalContainer"></div>
-      `;
-      renderSubSoalForms();
-    }
-    else if (tipe === 'bs') {
-      area.innerHTML = `
-        <label>Teks Narasi</label><textarea id="bsNarasi" rows="3"></textarea>
-        <label>Gambar</label><input id="bsGambar" placeholder="https://...">
-        <div id="bsPernyataanContainer"></div>
-        <label>Kunci (B/S pisah koma)</label><input id="bsKunci" placeholder="B,S,B,S,B">
-      `;
-      renderBSPernyataan();
-    }
-    else if (tipe === 'stts') {
-      area.innerHTML = `
-        <label>Teks Narasi</label><textarea id="sttsNarasi" rows="3"></textarea>
-        <label>Gambar</label><input id="sttsGambar" placeholder="https://...">
-        <div id="sttsPernyataanContainer"></div>
-      `;
-      renderSTTSPernyataan();
-    }
-    else if (tipe === 'cukup') {
-      area.innerHTML = `
-        <label>Pertanyaan</label><textarea id="cukupTeks" rows="2"></textarea>
-        <label>Pernyataan A</label><textarea id="cukupA" rows="2"></textarea>
-        <label>Gambar Opsi A</label><input id="cukupAGambar">
-        <label>Pernyataan B</label><textarea id="cukupB" rows="2"></textarea>
-        <label>Gambar Opsi B</label><input id="cukupBGambar">
-        <label>Gambar Opsi C</label><input id="cukupCGambar">
-        <label>Gambar Opsi D</label><input id="cukupDGambar">
-        <label>Kunci</label><select id="cukupKunci"><option>A</option><option>B</option><option>C</option><option>D</option></select>
-      `;
-    }
-  };
-  
-  window.renderPGOptions = function() {
-    const jml = parseInt(document.getElementById('pgJmlOpsi')?.value || 4);
-    const container = document.getElementById('pgOptionsArea');
-    if (!container) return;
-    let html = '<label>Opsi + Gambar</label>';
-    for (let i=0; i<jml; i++) {
-      const huruf = String.fromCharCode(65+i);
-      html += `<div class="option-with-img"><strong>${huruf}.</strong><input id="pgOpt${i}" placeholder="Teks ${huruf}"><input id="pgOptImg${i}" placeholder="URL Gambar" style="width:150px"></div>`;
-    }
-    container.innerHTML = html;
-  };
-  
-  window.renderPGKOptions = function() {
-    const container = document.getElementById('pgkOptionsArea');
-    if (!container) return;
-    let html = '<label>Opsi A-D + Gambar</label>';
-    for (let i=0; i<4; i++) {
-      const huruf = String.fromCharCode(65+i);
-      html += `<div class="option-with-img"><strong>${huruf}.</strong><input id="pgkOpt${i}" placeholder="Teks ${huruf}"><input id="pgkOptImg${i}" placeholder="URL Gambar" style="width:150px"></div>`;
-    }
-    container.innerHTML = html;
-  };
-  
-  window.renderSubSoalForms = function() {
-    const jml = parseInt(document.getElementById('narasiJml')?.value || 3);
-    const container = document.getElementById('subSoalContainer');
-    if (!container) return;
-    let html = '<h4>Soal dalam Narasi</h4>';
-    for (let i=0; i<jml; i++) {
-      html += `<div class="subsoal-form"><strong>Soal ${i+1}</strong><input id="subTeks${i}" placeholder="Pertanyaan"><div class="flex-row"><input id="subOptA${i}" placeholder="A"><input id="subOptB${i}" placeholder="B"><input id="subOptC${i}" placeholder="C"><input id="subOptD${i}" placeholder="D"></div><label>Jawaban</label><select id="subJawaban${i}"><option>A</option><option>B</option><option>C</option><option>D</option></select></div>`;
-    }
-    container.innerHTML = html;
-  };
-  
-  window.renderBSPernyataan = function() {
-    const container = document.getElementById('bsPernyataanContainer');
-    if (!container) return;
-    let html = '<h4>5 Pernyataan</h4>';
-    for (let i=0; i<5; i++) html += `<input id="bsPernyataan${i}" placeholder="Pernyataan ${i+1}" style="margin:8px 0">`;
-    container.innerHTML = html;
-  };
-  
-  window.renderSTTSPernyataan = function() {
-    const container = document.getElementById('sttsPernyataanContainer');
-    if (!container) return;
-    let html = '<h4>5 Pernyataan (Setuju/Tidak)</h4>';
-    for (let i=0; i<5; i++) html += `<input id="sttsPernyataan${i}" placeholder="Pernyataan ${i+1}" style="margin:8px 0">`;
-    container.innerHTML = html;
-  };
-  
-  async function simpanManual() {
-    const mapel = document.getElementById('manualMapel').value;
-    const tipe = document.getElementById('manualTipe').value;
-    let soalBaru = null;
-    
-    if (tipe === 'pg') {
-      const jml = parseInt(document.getElementById('pgJmlOpsi').value);
-      const opsi = [];
-      for (let i=0; i<jml; i++) opsi.push({ label: String.fromCharCode(65+i), teks: document.getElementById(`pgOpt${i}`)?.value || '', gambar: document.getElementById(`pgOptImg${i}`)?.value || '' });
-      soalBaru = { tipe: 'PG', teks: document.getElementById('pgTeks').value, gambar: document.getElementById('pgGambar').value, opsi, jawaban: document.getElementById('pgJawaban').value.split(',').map(Number), multi: true };
-    }
-    else if (tipe === 'pgk') {
-      const opsi = [];
-      for (let i=0; i<4; i++) opsi.push({ label: String.fromCharCode(65+i), teks: document.getElementById(`pgkOpt${i}`)?.value || '', gambar: document.getElementById(`pgkOptImg${i}`)?.value || '' });
-      soalBaru = { tipe: 'PGK', teks: document.getElementById('pgkTeks').value, gambar: document.getElementById('pgkGambar').value, opsi, jawaban: document.getElementById('pgkJawaban').value.split(',').map(Number), multi: true };
-    }
-    else if (tipe === 'narasi') {
-      const jml = parseInt(document.getElementById('narasiJml').value);
-      const soalList = [];
-      for (let i=0; i<jml; i++) {
-        soalList.push({ teks: document.getElementById(`subTeks${i}`)?.value || '', opsi: [document.getElementById(`subOptA${i}`)?.value || '', document.getElementById(`subOptB${i}`)?.value || '', document.getElementById(`subOptC${i}`)?.value || '', document.getElementById(`subOptD${i}`)?.value || ''], jawaban: [document.getElementById(`subJawaban${i}`)?.value || 'A'] });
-      }
-      soalBaru = { tipe: 'NARASI', narasi: document.getElementById('narasiTeks').value, gambar: document.getElementById('narasiGambar').value, soalList };
-    }
-    else if (tipe === 'bs') {
-      const pernyataan = [];
-      for (let i=0; i<5; i++) pernyataan.push(document.getElementById(`bsPernyataan${i}`)?.value || '');
-      soalBaru = { tipe: 'BS', teks: document.getElementById('bsNarasi').value, gambar: document.getElementById('bsGambar').value, pernyataan, kunci: document.getElementById('bsKunci').value.split(',') };
-    }
-    else if (tipe === 'stts') {
-      const pernyataan = [];
-      for (let i=0; i<5; i++) pernyataan.push(document.getElementById(`sttsPernyataan${i}`)?.value || '');
-      soalBaru = { tipe: 'STTS', teks: document.getElementById('sttsNarasi').value, gambar: document.getElementById('sttsGambar').value, pernyataan };
-    }
-    else if (tipe === 'cukup') {
-      soalBaru = { tipe: 'CUKUP', teks: document.getElementById('cukupTeks').value, pernyataanA: document.getElementById('cukupA').value, pernyataanB: document.getElementById('cukupB').value, opsiGambar: { A: document.getElementById('cukupAGambar').value, B: document.getElementById('cukupBGambar').value, C: document.getElementById('cukupCGambar').value, D: document.getElementById('cukupDGambar').value }, kunci: document.getElementById('cukupKunci').value };
-    }
-    
-    if (soalBaru) {
-      bankSoal[mapel].push(soalBaru);
-      saveBank();
-      if (gasUrl) await pushSoalToGAS(mapel, soalBaru);
-      Swal.fire('Tersimpan!', `Soal ${tipe} ditambahkan`, 'success');
-      render();
-    }
-  }
-  
-  // ========== AI GENERATE ==========
-  async function callAIGenerate(prompt, tipe) {
-    const key = apiKeys.gemini;
-    if (!key) { Swal.fire('Error', 'Masukkan Gemini API Key di Settings'); return null; }
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`;
-    const instruction = `Buat 3 soal ${tipe} tentang: ${prompt}. Format JSON: {"soal":[{"tipe":"PG","teks":"...","opsi":[{"label":"A","teks":"..."}],"jawaban":[0]}]}`;
-    try {
-      const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: instruction }] }] }) });
-      const data = await res.json();
-      return data.candidates[0].content.parts[0].text;
-    } catch(e) { Swal.fire('Error', e.message); return null; }
-  }
-  
-  function renderAIGenerate() {
-    return `
-      <div class="card">
-        <h2><i class="fas fa-microchip"></i> AI Generate Soal</h2>
-        <label>Mapel</label><select id="aiMapel">${Object.keys(bankSoal).map(m=>`<option>${m}</option>`).join('')}</select>
-        <label>Tipe Soal</label><select id="aiTipe"><option>PG</option><option>PGK</option><option>NARASI</option><option>BS</option><option>STTS</option><option>CUKUP</option></select>
-        <label>Prompt</label><textarea id="aiPrompt" rows="3" placeholder="Contoh: sistem pernapasan manusia"></textarea>
-        <button id="genAIBtn" class="btn-primary"><i class="fas fa-magic"></i> Generate</button>
-        <label>Hasil (JSON)</label><div id="aiResult" contenteditable="true" class="soal-editor" style="min-height:160px"></div>
-        <button id="simpanAI" class="btn-primary"><i class="fas fa-save"></i> Simpan ke Bank</button>
-      </div>
-    `;
-  }
-  
-  // ========== BANK SOAL ==========
-  function renderBankSoal() {
-    return `
-      <div class="card">
-        <h2><i class="fas fa-database"></i> Bank Soal</h2>
-        <select id="bankMapel" onchange="renderBankList()">${Object.keys(bankSoal).map(m=>`<option>${m}</option>`).join('')}</select>
-        <div id="bankList">${bankSoal[currentMapel]?.map((s,i)=>`<div class="soal-item"><strong>${i+1}. [${s.tipe}]</strong> ${s.teks || s.narasi?.substring(0,80)}...<button class="btn-outline hapusSoal" data-idx="${i}" style="float:right">Hapus</button></div>`).join('') || '<i>Kosong</i>'}</div>
-      </div>
-    `;
-  }
-  
-  window.renderBankList = function() {
-    const mapel = document.getElementById('bankMapel').value;
-    currentMapel = mapel;
-    render();
-  };
-  
-  // ========== TEST MAKER ==========
-  function renderTestMaker() {
-    return `
-      <div class="card">
-        <h2><i class="fas fa-sliders-h"></i> Test Maker</h2>
-        <div class="grid-2col">
-          <div><label>Durasi (menit)</label><input id="durasi" type="number" value="${examSettings.durasi || 60}"></div>
-          <div><label>Token Ujian</label><input id="token" value="${examSettings.token || 'EXAM2025'}"></div>
-          <div><label>Mapel Ujian</label><select id="mapelUjian">${Object.keys(bankSoal).map(m=>`<option>${m}</option>`).join('')}</select></div>
-        </div>
-        <button id="saveMaker" class="btn-primary"><i class="fas fa-save"></i> Simpan Pengaturan</button>
-      </div>
-    `;
-  }
-  
-  // ========== CBT ==========
-  function renderCBT() {
-    if (!cbtState.loggedIn) {
-      return `<div class="card"><h2><i class="fas fa-laptop-code"></i> Login CBT</h2><label>Nama</label><input id="cbtNama"><label>Kelas</label><input id="cbtKelas"><label>Token</label><input id="cbtToken"><button id="cbtLogin" class="btn-primary">Masuk</button></div>`;
-    }
-    const q = cbtState.soalList[cbtState.currentIndex];
-    return `<div class="card"><h3>Soal ${cbtState.currentIndex+1}/${cbtState.soalList.length}</h3><p>${q?.teks || q?.narasi || ''}</p><div id="cbtOptArea"></div><div class="flex-row"><button id="cbtPrev" class="btn-outline">Prev</button><button id="cbtNext" class="btn-outline">Next</button><button id="cbtSubmit" class="btn-primary">Submit</button></div></div>`;
-  }
-  
-  // ========== SETTINGS ==========
-  function renderSettings() {
-    return `
-      <div class="card">
-        <h2><i class="fas fa-cog"></i> Settings</h2>
-        <label>Gemini API Key</label><input id="geminiKey" value="${apiKeys.gemini}">
-        <label>GAS Web App URL</label><input id="gasUrlInput" value="${gasUrl}">
-        <div class="flex-row"><button id="saveSettingsBtn" class="btn-primary">Simpan</button><button id="testGasBtn" class="btn-outline">Test GAS</button></div>
-      </div>
-    `;
-  }
-  
-  // ========== EVENT HANDLER ==========
-  function attachEvents() {
-    document.getElementById('simpanManualBtn')?.addEventListener('click', simpanManual);
-    document.getElementById('genAIBtn')?.addEventListener('click', async () => {
-      const prompt = document.getElementById('aiPrompt')?.value;
-      if (!prompt) { Swal.fire('Isi prompt'); return; }
-      Swal.fire({ title: 'AI Working...', didOpen: () => Swal.showLoading() });
-      const res = await callAIGenerate(prompt, document.getElementById('aiTipe')?.value);
-      Swal.close();
-      if (res) document.getElementById('aiResult').innerText = res;
-    });
-    document.getElementById('simpanAI')?.addEventListener('click', () => {
-      const json = document.getElementById('aiResult')?.innerText;
-      try {
-        const soal = JSON.parse(json);
-        const mapel = document.getElementById('aiMapel')?.value;
-        bankSoal[mapel].push(soal);
-        saveBank();
-        Swal.fire('Tersimpan');
-      } catch(e) { Swal.fire('JSON invalid'); }
-    });
-    document.getElementById('saveMaker')?.addEventListener('click', () => {
-      examSettings.durasi = document.getElementById('durasi').value;
-      examSettings.token = document.getElementById('token').value;
-      examSettings.mapelUjian = document.getElementById('mapelUjian').value;
-      examSettings.soalUjian = bankSoal[examSettings.mapelUjian] || [];
-      saveSettings();
-      Swal.fire('Pengaturan tersimpan');
-    });
-    document.getElementById('cbtLogin')?.addEventListener('click', () => {
-      const token = document.getElementById('cbtToken').value;
-      if (token !== examSettings.token) { Swal.fire('Token salah'); return; }
-      cbtState.loggedIn = true;
-      cbtState.siswa = { nama: document.getElementById('cbtNama').value, kelas: document.getElementById('cbtKelas').value };
-      cbtState.soalList = examSettings.soalUjian || bankSoal[examSettings.mapelUjian || 'Matematika'] || [];
-      cbtState.jawaban = new Array(cbtState.soalList.length).fill(null);
-      cbtState.currentIndex = 0;
-      render();
-    });
-    document.getElementById('saveSettingsBtn')?.addEventListener('click', () => {
-      apiKeys.gemini = document.getElementById('geminiKey').value;
-      gasUrl = document.getElementById('gasUrlInput').value;
-      saveSettings();
-      Swal.fire('Tersimpan');
-    });
-    document.getElementById('testGasBtn')?.addEventListener('click', async () => {
-      if (!gasUrl) { Swal.fire('URL kosong'); return; }
-      const res = await callGAS('getAllMapel');
-      Swal.fire(res.success ? 'Terhubung!' : 'Gagal', res.error || 'OK');
-    });
-    document.querySelectorAll('.hapusSoal')?.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const idx = btn.dataset.idx;
-        bankSoal[currentMapel].splice(idx,1);
-        saveBank();
-        render();
+    if (menu === 'ai-generate') {
+      document.getElementById('genAIBtn')?.addEventListener('click', async () => {
+        const prompt = document.getElementById('aiPrompt').value;
+        const tipe = document.getElementById('aiTipe').value;
+        if (!prompt) { Swal.fire('Isi prompt dulu'); return; }
+        Swal.fire({ title: 'AI Working...', didOpen: () => Swal.showLoading() });
+        const result = await callAIGenerate(prompt, tipe);
+        Swal.close();
+        if (result) document.getElementById('aiResultEditor').innerText = result;
       });
-    });
+      document.getElementById('simpanAIKeBank')?.addEventListener('click', () => {
+        const jsonText = document.getElementById('aiResultEditor').innerText;
+        const mapel = document.getElementById('aiMapel').value;
+        try {
+          const soal = JSON.parse(jsonText);
+          bankSoal[mapel].push(soal);
+          saveBank();
+          Swal.fire('Sukses', 'Soal AI tersimpan ke bank', 'success');
+        } catch(e) { Swal.fire('Error', 'Format JSON tidak valid', 'error'); }
+      });
+    }
+    if (menu === 'settings') {
+      document.getElementById('saveApiBtn')?.addEventListener('click', () => {
+        apiKeys.gemini = document.getElementById('geminiKey').value;
+        saveSettings();
+        Swal.fire('Tersimpan');
+      });
+    }
   }
-  
-  // ========== NAVIGASI ==========
+
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -728,7 +455,6 @@
       render();
     });
   });
-  
   render();
 </script>
 </body>
