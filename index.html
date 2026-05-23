@@ -259,6 +259,9 @@
       border-radius: 40px;
       font-size: 0.7rem;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     
     .mapel-tag {
@@ -285,6 +288,25 @@
     .mapel-tag i {
       cursor: pointer;
       color: #d32f2f;
+    }
+    
+    .api-status {
+      padding: 12px 16px;
+      border-radius: 20px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+    }
+    
+    .api-status.valid {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+    
+    .api-status.invalid {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
     }
     
     @media (max-width: 800px) {
@@ -350,8 +372,9 @@
   
   let currentMapel = "Matematika";
   let examSettings = JSON.parse(localStorage.getItem('examSettingsCplx') || '{}');
-  let apiKeys = JSON.parse(localStorage.getItem("apiKeys") || `{ "gemini": "", "groq": "" }`);
+  let apiKeys = JSON.parse(localStorage.getItem("apiKeys") || `{ "gemini": "", "geminiModel": "gemini-2.5-flash" }`);
   let gasUrl = localStorage.getItem('gasUrl') || '';
+  let apiKeyValid = false;
   
   let cbtState = {
     loggedIn: false,
@@ -369,6 +392,168 @@
     localStorage.setItem('examSettingsCplx', JSON.stringify(examSettings)); 
     localStorage.setItem("apiKeys", JSON.stringify(apiKeys));
     localStorage.setItem('gasUrl', gasUrl);
+  }
+  
+  // ========== VALIDASI API KEY GEMINI ==========
+  async function testGeminiAPI(apiKey, model = "gemini-2.5-flash") {
+    if (!apiKey || apiKey.trim() === "") {
+      return { valid: false, message: "API Key kosong" };
+    }
+    
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+    
+    try {
+      const response = await fetch(endpoint);
+      const data = await response.json();
+      
+      if (data.error) {
+        return { valid: false, message: data.error.message || "API Key tidak valid" };
+      }
+      return { valid: true, message: "API Key valid!", models: data.models };
+    } catch (error) {
+      return { valid: false, message: "Gagal terhubung: " + error.message };
+    }
+  }
+  
+  async function validateAndSaveAPI() {
+    const apiKey = document.getElementById('geminiKey')?.value;
+    const model = document.getElementById('geminiModel')?.value || "gemini-3-flash-preview";
+    
+    if (!apiKey || apiKey.trim() === "") {
+      Swal.fire({
+        title: 'API Key kosong',
+        text: 'Masukkan Gemini API Key terlebih dahulu. Dapatkan gratis di https://aistudio.google.com',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+      });
+      return false;
+    }
+    
+    Swal.fire({
+      title: 'Menguji API Key...',
+      text: 'Mohon tunggu sebentar',
+      didOpen: () => Swal.showLoading()
+    });
+    
+    const result = await testGeminiAPI(apiKey, model);
+    Swal.close();
+    
+    if (result.valid) {
+      apiKeys.gemini = apiKey;
+      apiKeys.geminiModel = model;
+      apiKeyValid = true;
+      saveSettings();
+      
+      Swal.fire({
+        title: '✅ API Key Valid!',
+        text: `Model yang tersedia siap digunakan.`,
+        icon: 'success',
+        timer: 2000
+      });
+      return true;
+    } else {
+      apiKeyValid = false;
+      Swal.fire({
+        title: '❌ API Key Tidak Valid',
+        text: result.message,
+        icon: 'error',
+        confirmButtonText: 'Coba Lagi'
+      });
+      return false;
+    }
+  }
+  
+  // ========== AI CALL DENGAN VALIDASI ==========
+  async function callGeminiAPI(prompt, systemInstruction = "") {
+    // Cek API Key
+    if (!apiKeys.gemini || apiKeys.gemini.trim() === "") {
+      const result = await Swal.fire({
+        title: 'API Key Belum Diset',
+        text: 'Silakan masukkan Gemini API Key di menu Settings terlebih dahulu.\n\nDapatkan gratis di https://aistudio.google.com',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Buka Settings',
+        cancelButtonText: 'Batal'
+      });
+      
+      if (result.isConfirmed) {
+        document.querySelector('.nav-item[data-menu="settings"]').click();
+      }
+      return null;
+    }
+    
+    const model = apiKeys.geminiModel || "gemini-3-flash-preview";
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKeys.gemini}`;
+    
+    const fullPrompt = systemInstruction + "\n\n" + prompt;
+    
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: fullPrompt }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+            topP: 0.95
+          }
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        if (data.error.message.includes("API key")) {
+          Swal.fire({
+            title: 'API Key Error',
+            text: 'API Key tidak valid atau sudah kadaluarsa. Silakan periksa kembali.',
+            icon: 'error'
+          });
+          apiKeyValid = false;
+          return null;
+        }
+        throw new Error(data.error.message);
+      }
+      
+      apiKeyValid = true;
+      return data.candidates[0].content.parts[0].text;
+      
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.message,
+        icon: 'error'
+      });
+      return null;
+    }
+  }
+  
+  async function callAIGenerate(prompt, tipeSoal) {
+    const systemInstruction = `Anda adalah asisten pembuat soal ujian profesional. Buatlah soal dengan format JSON yang valid.
+Tipe soal: ${tipeSoal}
+Konteks materi: ${prompt}
+
+Format output HARUS JSON seperti contoh:
+{
+  "soal": [
+    {
+      "tipe": "PG",
+      "teks": "Pertanyaan soal?",
+      "opsi": [
+        {"label": "A", "teks": "Opsi A"},
+        {"label": "B", "teks": "Opsi B"},
+        {"label": "C", "teks": "Opsi C"},
+        {"label": "D", "teks": "Opsi D"}
+      ],
+      "jawaban": [0]
+    }
+  ]
+}
+
+Hanya output JSON, tanpa teks lain. Buat minimal 2 soal.`;
+    
+    return await callGeminiAPI(prompt, systemInstruction);
   }
   
   // ========== TAMBAH MAPEL BARU ==========
@@ -433,38 +618,27 @@
         </div>
       `;
     });
-    html += `<button class="btn-outline btn-sm" id="btnTambahMapelCepat"><i class="fas fa-plus"></i> Tambah</button></div>`;
-    document.getElementById(containerId).innerHTML = html;
+    html += `<button class="btn-outline btn-sm" id="btnTambahMapelCepat"><i class="fas fa-plus"></i> Tambah Mapel</button></div>`;
     
-    document.querySelectorAll('.mapel-tag').forEach(tag => {
-      tag.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'I') {
-          currentMapel = tag.dataset.mapel;
-          if (onChangeCallback) onChangeCallback();
-          render();
-        }
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = html;
+      
+      document.querySelectorAll('.mapel-tag').forEach(tag => {
+        tag.addEventListener('click', (e) => {
+          if (e.target.tagName !== 'I') {
+            currentMapel = tag.dataset.mapel;
+            if (onChangeCallback) onChangeCallback();
+            render();
+          }
+        });
       });
-    });
-    
-    document.getElementById('btnTambahMapelCepat')?.addEventListener('click', async () => {
-      await tambahMapelBaru();
-      if (onChangeCallback) onChangeCallback();
-      render();
-    });
-  }
-  
-  // ========== GAS INTEGRATION ==========
-  async function callGAS(action, data = {}) {
-    if (!gasUrl) return { success: false, error: 'GAS URL belum diisi' };
-    try {
-      const response = await fetch(gasUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, ...data })
+      
+      document.getElementById('btnTambahMapelCepat')?.addEventListener('click', async () => {
+        await tambahMapelBaru();
+        if (onChangeCallback) onChangeCallback();
+        render();
       });
-      return await response.json();
-    } catch (e) {
-      return { success: false, error: e.message };
     }
   }
   
@@ -654,223 +828,4 @@
     else if (tipe === 'stts') {
       const pernyataan = [];
       for (let i=0; i<5; i++) pernyataan.push(document.getElementById(`sttsPernyataan${i}`)?.value || '');
-      soalBaru = { tipe: 'STTS', teks: document.getElementById('sttsNarasi').value, gambar: document.getElementById('sttsGambar').value, pernyataan };
-    }
-    else if (tipe === 'cukup') {
-      soalBaru = { tipe: 'CUKUP', teks: document.getElementById('cukupTeks').value, pernyataanA: document.getElementById('cukupA').value, pernyataanB: document.getElementById('cukupB').value, opsiGambar: { A: document.getElementById('cukupAGambar').value, B: document.getElementById('cukupBGambar').value, C: document.getElementById('cukupCGambar').value, D: document.getElementById('cukupDGambar').value }, kunci: document.getElementById('cukupKunci').value };
-    }
-    
-    if (soalBaru) {
-      bankSoal[mapel].push(soalBaru);
-      saveBank();
-      Swal.fire('Tersimpan!', `Soal ${tipe} ditambahkan ke ${mapel}`, 'success');
-      render();
-    }
-  }
-  
-  // ========== AI GENERATE ==========
-  async function callAIGenerate(prompt, tipe) {
-    const key = apiKeys.gemini;
-    if (!key) { Swal.fire('Error', 'Masukkan Gemini API Key di Settings'); return null; }
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${key}`;
-    const instruction = `Buat 3 soal ${tipe} tentang: ${prompt}. Format JSON: {"soal":[{"tipe":"PG","teks":"...","opsi":[{"label":"A","teks":"..."}],"jawaban":[0]}]}`;
-    try {
-      const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: instruction }] }] }) });
-      const data = await res.json();
-      return data.candidates[0].content.parts[0].text;
-    } catch(e) { Swal.fire('Error', e.message); return null; }
-  }
-  
-  function renderAIGenerate() {
-    return `
-      <div class="card">
-        <h2><i class="fas fa-microchip"></i> AI Generate Soal</h2>
-        <div id="mapelTagsContainerAI"></div>
-        <label>Tipe Soal</label><select id="aiTipe"><option>PG</option><option>PGK</option><option>NARASI</option><option>BS</option><option>STTS</option><option>CUKUP</option></select>
-        <label>Prompt</label><textarea id="aiPrompt" rows="3" placeholder="Contoh: sistem pernapasan manusia kelas 8"></textarea>
-        <button id="genAIBtn" class="btn-primary"><i class="fas fa-magic"></i> Generate</button>
-        <label>Hasil (JSON)</label><div id="aiResult" contenteditable="true" class="soal-editor" style="min-height:160px"></div>
-        <button id="simpanAI" class="btn-primary"><i class="fas fa-save"></i> Simpan ke Bank</button>
-      </div>
-    `;
-  }
-  
-  // ========== BANK SOAL ==========
-  function renderBankSoal() {
-    const soalList = bankSoal[currentMapel] || [];
-    return `
-      <div class="card">
-        <h2><i class="fas fa-database"></i> Bank Soal</h2>
-        <div id="mapelTagsContainerBank"></div>
-        <div class="flex-row" style="justify-content: space-between; margin-bottom: 20px;">
-          <span class="badge"><i class="fas fa-list"></i> Total: ${soalList.length} soal</span>
-          <button id="tambahSoalCepat" class="btn-primary btn-sm"><i class="fas fa-plus"></i> Tambah Soal</button>
-        </div>
-        <div id="bankList">
-          ${soalList.length === 0 ? '<i class="fas fa-inbox"></i> Belum ada soal. Klik "Tambah Soal" untuk mulai.' : 
-            soalList.map((s,i)=>`<div class="soal-item">
-              <strong>${i+1}. [${s.tipe}]</strong> ${(s.teks || s.narasi || '').substring(0,100)}...
-              <div class="flex-row" style="margin-top: 12px;">
-                <button class="btn-outline btn-sm editSoal" data-idx="${i}"><i class="fas fa-edit"></i> Edit</button>
-                <button class="btn-danger btn-sm hapusSoal" data-idx="${i}"><i class="fas fa-trash"></i> Hapus</button>
-              </div>
-            </div>`).join('')
-          }
-        </div>
-      </div>
-    `;
-  }
-  
-  // ========== TEST MAKER ==========
-  function renderTestMaker() {
-    return `
-      <div class="card">
-        <h2><i class="fas fa-sliders-h"></i> Test Maker</h2>
-        <div id="mapelTagsContainerMaker"></div>
-        <div class="grid-2col">
-          <div><label>Durasi (menit)</label><input id="durasi" type="number" value="${examSettings.durasi || 60}"></div>
-          <div><label>Token Ujian</label><input id="token" value="${examSettings.token || 'EXAM2025'}"></div>
-        </div>
-        <button id="saveMaker" class="btn-primary"><i class="fas fa-save"></i> Simpan Pengaturan</button>
-        <div style="margin-top: 16px; padding: 12px; background: #e8f5e9; border-radius: 20px;">
-          <i class="fas fa-info-circle"></i> Soal yang akan diujikan dari mapel <strong>${currentMapel}</strong> (${bankSoal[currentMapel]?.length || 0} soal)
-        </div>
-      </div>
-    `;
-  }
-  
-  // ========== CBT ==========
-  function renderCBTLogin() {
-    if (!cbtState.loggedIn) {
-      return `<div class="card"><h2><i class="fas fa-laptop-code"></i> Login CBT</h2>
-        <label>Nama Lengkap</label><input id="cbtNama" placeholder="Nama siswa">
-        <label>Kelas</label><input id="cbtKelas" placeholder="Kelas">
-        <label>Token Ujian</label><input id="cbtToken" placeholder="Masukkan token">
-        <button id="cbtLogin" class="btn-primary">Mulai Ujian</button>
-      </div>`;
-    }
-    const q = cbtState.soalList[cbtState.currentIndex];
-    return `<div class="card">
-      <h3>Soal ${cbtState.currentIndex+1} / ${cbtState.soalList.length}</h3>
-      <p style="margin: 20px 0; font-size: 1.1rem;">${q?.teks || q?.narasi || ''}</p>
-      <div id="cbtOptArea"></div>
-      <div class="flex-row" style="margin-top: 20px;">
-        <button id="cbtPrev" class="btn-outline"><i class="fas fa-arrow-left"></i> Prev</button>
-        <button id="cbtNext" class="btn-outline">Next <i class="fas fa-arrow-right"></i></button>
-        <button id="cbtSubmit" class="btn-primary"><i class="fas fa-check"></i> Selesai</button>
-      </div>
-    </div>`;
-  }
-  
-  // ========== SETTINGS ==========
-  function renderSettings() {
-    return `
-      <div class="card">
-        <h2><i class="fas fa-cog"></i> Settings</h2>
-        <label><i class="fab fa-google"></i> Gemini API Key</label>
-        <input id="geminiKey" value="${apiKeys.gemini}" placeholder="AIzaSy...">
-        <label><i class="fas fa-cloud-upload-alt"></i> Google Apps Script URL</label>
-        <input id="gasUrlInput" value="${gasUrl}" placeholder="https://script.google.com/macros/s/.../exec">
-        <div class="flex-row"><button id="saveSettingsBtn" class="btn-primary">Simpan</button><button id="testGasBtn" class="btn-outline">Test Koneksi</button></div>
-      </div>
-    `;
-  }
-  
-  // ========== EVENT HANDLER ==========
-  function attachEvents() {
-    // Mapel tags
-    const mapelContainers = ['mapelTagsContainer', 'mapelTagsContainerAI', 'mapelTagsContainerBank', 'mapelTagsContainerMaker'];
-    mapelContainers.forEach(id => {
-      if (document.getElementById(id)) {
-        renderMapelTags(id, () => render());
-      }
-    });
-    
-    document.getElementById('simpanManualBtn')?.addEventListener('click', simpanManual);
-    document.getElementById('tambahSoalCepat')?.addEventListener('click', () => {
-      document.querySelector('.nav-item[data-menu="manual"]').click();
-    });
-    
-    document.getElementById('genAIBtn')?.addEventListener('click', async () => {
-      const prompt = document.getElementById('aiPrompt')?.value;
-      if (!prompt) { Swal.fire('Isi prompt dulu'); return; }
-      Swal.fire({ title: 'AI Working...', didOpen: () => Swal.showLoading() });
-      const res = await callAIGenerate(prompt, document.getElementById('aiTipe')?.value);
-      Swal.close();
-      if (res) document.getElementById('aiResult').innerText = res;
-    });
-    
-    document.getElementById('simpanAI')?.addEventListener('click', () => {
-      const json = document.getElementById('aiResult')?.innerText;
-      try {
-        const data = JSON.parse(json);
-        const soalList = data.soal || [data];
-        soalList.forEach(soal => {
-          bankSoal[currentMapel].push(soal);
-        });
-        saveBank();
-        Swal.fire(`Tersimpan ${soalList.length} soal ke ${currentMapel}`);
-      } catch(e) { Swal.fire('Format JSON tidak valid', e.message, 'error'); }
-    });
-    
-    document.getElementById('saveMaker')?.addEventListener('click', () => {
-      examSettings.durasi = document.getElementById('durasi').value;
-      examSettings.token = document.getElementById('token').value;
-      examSettings.mapelUjian = currentMapel;
-      examSettings.soalUjian = bankSoal[currentMapel] || [];
-      saveSettings();
-      Swal.fire('Pengaturan tersimpan', `Mapel: ${currentMapel} (${examSettings.soalUjian.length} soal)`, 'success');
-    });
-    
-    document.getElementById('cbtLogin')?.addEventListener('click', () => {
-      const token = document.getElementById('cbtToken').value;
-      if (token !== examSettings.token) { Swal.fire('Token salah!'); return; }
-      if (!bankSoal[currentMapel]?.length) { Swal.fire('Belum ada soal di mapel ini'); return; }
-      cbtState.loggedIn = true;
-      cbtState.siswa = { nama: document.getElementById('cbtNama').value, kelas: document.getElementById('cbtKelas').value };
-      cbtState.soalList = bankSoal[currentMapel];
-      cbtState.jawaban = new Array(cbtState.soalList.length).fill(null);
-      cbtState.currentIndex = 0;
-      render();
-    });
-    
-    document.getElementById('saveSettingsBtn')?.addEventListener('click', () => {
-      apiKeys.gemini = document.getElementById('geminiKey').value;
-      gasUrl = document.getElementById('gasUrlInput').value;
-      saveSettings();
-      Swal.fire('Tersimpan');
-    });
-    
-    document.getElementById('testGasBtn')?.addEventListener('click', async () => {
-      if (!gasUrl) { Swal.fire('URL kosong'); return; }
-      const res = await callGAS('getAllMapel');
-      Swal.fire(res.success ? 'Terhubung ke GAS!' : 'Gagal konek', res.error || 'OK');
-    });
-    
-    document.querySelectorAll('.hapusSoal')?.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const idx = btn.dataset.idx;
-        Swal.fire({ title: 'Hapus soal?', icon: 'warning', showCancelButton: true }).then(res => {
-          if (res.isConfirmed) {
-            bankSoal[currentMapel].splice(idx,1);
-            saveBank();
-            render();
-          }
-        });
-      });
-    });
-  }
-  
-  // ========== NAVIGASI ==========
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      item.classList.add('active');
-      render();
-    });
-  });
-  
-  render();
-</script>
-</body>
-</html>
+      soalBaru = { tipe: 'STTS', teks: document.getElementById('sttsNarasi').value, gambar: document.getElementById('stts
